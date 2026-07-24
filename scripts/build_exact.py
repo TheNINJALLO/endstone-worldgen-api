@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-VERSION = "0.4.5-beta.3"
+VERSION = "0.4.5-beta.4"
 PROJECT = "worldgen"
 PROJECT_SLUG = "endstone-worldgen-api"
 SUPPORTED_BDS = {"1.26.32", "1.26.33"}
@@ -154,7 +154,7 @@ def main() -> int:
         f"-DCMAKE_INSTALL_PREFIX={stage_dir}",
         "-DENDSTONE_WORLDGEN_BUILD_TESTS=OFF",
         "-DENDSTONE_WORLDGEN_BUILD_PLUGIN=ON",
-        "-DENDSTONE_WORLDGEN_BUILD_NATIVE_2630=OFF",
+        "-DENDSTONE_WORLDGEN_BUILD_NATIVE_2630=ON",
         f"-DENDSTONE_BDS_BUILD={args.bds}",
     ]
     
