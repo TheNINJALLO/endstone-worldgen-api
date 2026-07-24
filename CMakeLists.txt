@@ -73,7 +73,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
 
     if(EXISTS "${endstone_SOURCE_DIR}/src/bedrock/server/commands/command_registry.h")
         file(READ "${endstone_SOURCE_DIR}/src/bedrock/server/commands/command_registry.h" ENDSTONE_CMD_REG_CONTENT)
-        string(REPLACE "R\"(, \"children\": {})\", *it->child)" "R\"(, \"children\": {})\", static_cast<int>(*it->child))" ENDSTONE_CMD_REG_CONTENT "${ENDSTONE_CMD_REG_CONTENT}")
+        string(REPLACE "R\"(, \"children\": {})\", *it->child)" "R\"(, \"children\": {})\", 0)" ENDSTONE_CMD_REG_CONTENT "${ENDSTONE_CMD_REG_CONTENT}")
         file(WRITE "${endstone_SOURCE_DIR}/src/bedrock/server/commands/command_registry.h" "${ENDSTONE_CMD_REG_CONTENT}")
     endif()
 
