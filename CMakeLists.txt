@@ -88,6 +88,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     )
     target_link_libraries(worldgen_api PRIVATE
         endstone_worldgen_core
+        bedrock::bedrock
         aklomp::base64
         boost::boost
         concurrentqueue::concurrentqueue
