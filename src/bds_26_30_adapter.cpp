@@ -221,7 +221,7 @@ public:
         if (!verifySymbols()) return std::nullopt;
         auto *level = server_.getLevel();
         auto *dimension = level ? level->getDimension(dimension_name) : nullptr;
-        auto *exact = dynamic_cast<endstone::core::EndstoneDimension *>(dimension);
+        auto *exact = static_cast<endstone::core::EndstoneDimension *>(dimension);
         if (!dimension || !exact) return std::nullopt;
 
         auto [min_y, max_y] = heightRange(dimension->getType());
@@ -295,7 +295,7 @@ public:
         if (!verifySymbols()) return false;
         auto *level = server_.getLevel();
         auto *dimension = level ? level->getDimension(dimension_name) : nullptr;
-        auto *exact = dynamic_cast<endstone::core::EndstoneDimension *>(dimension);
+        auto *exact = static_cast<endstone::core::EndstoneDimension *>(dimension);
         if (!exact) return false;
         auto &source = exact->getHandle().getBlockSourceFromMainChunkSource();
         source.getChunkSource().flushThreadBatch();
@@ -313,7 +313,7 @@ public:
         std::size_t bound{};
         try {
             for (auto *dimension : level->getDimensions()) {
-                auto *exact = dynamic_cast<endstone::core::EndstoneDimension *>(dimension);
+                auto *exact = static_cast<endstone::core::EndstoneDimension *>(dimension);
                 if (!exact) continue;
                 auto *source = &exact->getHandle().getBlockSourceFromMainChunkSource().getChunkSource();
                 std::scoped_lock lock(g_hook_mutex);

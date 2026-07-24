@@ -21,7 +21,7 @@ from endstone_worldgen import (
 class WorldGenTestPlugin(Plugin):
     api_version = "0.4"
     name = "WorldGenTestPlugin"
-    version = "0.4.5-beta.10"
+    version = "0.4.5-beta.11"
     description = "In-game validation test suite for Endstone WorldGen API"
 
     commands = {
