@@ -1,39 +1,34 @@
 # Endstone WorldGen API
 
-[![Version](https://img.shields.io/badge/version-v0.4.5--alpha.9-blue.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.5-alpha.9)
+[![Version](https://img.shields.io/badge/version-v0.4.5--beta.1-blue.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.5-beta.1)
 [![Endstone](https://img.shields.io/badge/Endstone-v0.11.5%20%7C%20v0.11.6-emerald.svg?style=for-the-badge)](https://github.com/EndstoneMC/endstone)
-[![BDS Support](https://img.shields.io/badge/BDS-1.26.32%20%7C%201.26.33-purple.svg?style=for-the-badge)](https://www.minecraft.net/en-us/download/server/bedrock)
+[![BDS Version](https://img.shields.io/badge/BDS-1.26.32%20%7C%201.26.33-purple.svg?style=for-the-badge)](https://www.minecraft.net/en-us/download/server/bedrock)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/actions)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20x64-orange.svg?style=for-the-badge)](#installation)
-[![Language](https://img.shields.io/badge/c%2B%2B-20-blue.svg?style=for-the-badge)](#)
-[![Python](https://img.shields.io/badge/python-3.9%2B-yellow.svg?style=for-the-badge)](#)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-orange.svg?style=for-the-badge)](#-direct-release-downloads-v045-beta1)
+[![Language](https://img.shields.io/badge/language-C%2B%2B20%20%7C%20Python-3776AB.svg?style=for-the-badge)](#-c--python-api-quickstart)
 [![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-> Multi-threaded terrain chunk interceptor, asynchronous generation scheduler, and neighborhood boundary lock engine for **Endstone Minecraft Bedrock Edition** servers.
+A high-performance, detached **Multi-Threaded Terrain Generation**, **Chunk Interception**, and **Neighborhood Boundary Locking** API for Endstone Bedrock Dedicated Servers (BDS).
+
+Designed for procedural world generation, multi-chunk structure generation, custom noise carvers, and custom biome stages without risking main server thread stutter.
 
 ---
 
-## 🚀 Key Features
+## 📚 Documentation & Technical Wiki
 
-- **⚡ Multi-Threaded Chunk Generation**: Asynchronous worker threadpool (`GenerationScheduler`) offloading heavy noise calculations from the main server loop.
-- **🧱 Uncompressed 3D Chunk Buffer**: High-speed direct 3D array index access `(X, Y, Z)` with BLAKE2b fingerprint hashing.
-- **🔒 Neighborhood Boundary Lock Engine**: Cross-chunk thread synchronization ensuring multi-chunk structure placement without race conditions or edge tears.
-- **🌐 Dual C++20 & Python 3.9+ API**: Native C++ service registered in Endstone `ServiceManager` alongside clean Python interfaces.
-- **🎮 In-Game Interactive Studio**: Includes built-in `/wg` command suite for live terrain generation, structure spawning, and stress testing.
+Comprehensive guides, architecture diagrams, neighborhood locking tutorials, and full API specifications are available on the [**Docsify Documentation Site**](docs/README.md).
 
 ---
 
-## 📦 Direct Release Downloads (`v0.4.5-alpha.9`)
+## 📦 Direct Release Downloads (`v0.4.5-beta.1`)
 
-Download official pre-compiled binaries matching your target server OS and BDS version:
-
-| Target Platform | BDS Version | Plugin Binary Asset | Download |
+| Platform | BDS Version | Artifact Filename | Direct Download |
 | :--- | :--- | :--- | :--- |
-| **Windows x64** | `1.26.32` | `endstone-worldgen-api-v0.4.5-alpha.9-bds-1.26.32-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-alpha.9/endstone-worldgen-api-v0.4.5-alpha.9-bds-1.26.32-windows-x64.dll) |
-| **Windows x64** | `1.26.33` | `endstone-worldgen-api-v0.4.5-alpha.9-bds-1.26.33-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-alpha.9/endstone-worldgen-api-v0.4.5-alpha.9-bds-1.26.33-windows-x64.dll) |
-| **Linux x64** | `1.26.32` | `endstone-worldgen-api-v0.4.5-alpha.9-bds-1.26.32-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-alpha.9/endstone-worldgen-api-v0.4.5-alpha.9-bds-1.26.32-linux-x64.so) |
-| **Linux x64** | `1.26.33` | `endstone-worldgen-api-v0.4.5-alpha.9-bds-1.26.33-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-alpha.9/endstone-worldgen-api-v0.4.5-alpha.9-bds-1.26.33-linux-x64.so) |
-| **Python Wheel** | `Universal` | `endstone_worldgen_studio-0.4.5a9-py3-none-any.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-alpha.9/endstone_worldgen_studio-0.4.5a9-py3-none-any.whl) |
+| **Windows x64** | `1.26.32` | `endstone-worldgen-api-v0.4.5-beta.1-bds-1.26.32-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.1/endstone-worldgen-api-v0.4.5-beta.1-bds-1.26.32-windows-x64.dll) |
+| **Windows x64** | `1.26.33` | `endstone-worldgen-api-v0.4.5-beta.1-bds-1.26.33-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.1/endstone-worldgen-api-v0.4.5-beta.1-bds-1.26.33-windows-x64.dll) |
+| **Linux x64** | `1.26.32` | `endstone-worldgen-api-v0.4.5-beta.1-bds-1.26.32-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.1/endstone-worldgen-api-v0.4.5-beta.1-bds-1.26.32-linux-x64.so) |
+| **Linux x64** | `1.26.33` | `endstone-worldgen-api-v0.4.5-beta.1-bds-1.26.33-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.1/endstone-worldgen-api-v0.4.5-beta.1-bds-1.26.33-linux-x64.so) |
+| **Python Wheel** | `Universal` | `endstone_worldgen_studio-0.4.5b1-py3-none-any.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.1/endstone_worldgen_studio-0.4.5b1-py3-none-any.whl) |
 
 ---
 
