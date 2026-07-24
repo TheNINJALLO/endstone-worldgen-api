@@ -154,7 +154,7 @@ def main() -> int:
         f"-DCMAKE_INSTALL_PREFIX={stage_dir}",
         "-DENDSTONE_WORLDGEN_BUILD_TESTS=OFF",
         "-DENDSTONE_WORLDGEN_BUILD_PLUGIN=ON",
-        "-DENDSTONE_WORLDGEN_BUILD_NATIVE_2630=ON",
+        "-DENDSTONE_WORLDGEN_BUILD_NATIVE_2630=OFF",
         f"-DENDSTONE_BDS_BUILD={args.bds}",
     ]
     
