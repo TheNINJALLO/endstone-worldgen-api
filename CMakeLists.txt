@@ -73,6 +73,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
 
     endstone_add_plugin(worldgen_api ${WORLDGEN_PLUGIN_SOURCES})
     set_target_properties(worldgen_api PROPERTIES
+        PREFIX ""
         OUTPUT_NAME "endstone_worldgen_bds_${ENDSTONE_BDS_BUILD_FILE}"
     )
     target_include_directories(worldgen_api PRIVATE
