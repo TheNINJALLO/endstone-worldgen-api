@@ -40,6 +40,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     # Conan generates these package configs from the exact versions pinned in conanfile.py.
     find_package(base64 REQUIRED)
     find_package(Boost REQUIRED)
+    find_package(date REQUIRED)
     find_package(EnTT REQUIRED)
     find_package(glm REQUIRED)
     find_package(magic_enum REQUIRED)
@@ -71,11 +72,14 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     target_compile_definitions(worldgen_api PRIVATE
         ENDSTONE_WORLDGEN_NATIVE_2630=$<BOOL:${ENDSTONE_WORLDGEN_BUILD_NATIVE_2630}>
         ENDSTONE_WORLDGEN_BDS_BUILD="${ENDSTONE_BDS_BUILD}"
+        ENTT_SPARSE_PAGE=2048
+        ENTT_NO_MIXIN
     )
     target_link_libraries(worldgen_api PRIVATE
         endstone_worldgen_core
         aklomp::base64
         boost::boost
+        date::date
         EnTT::EnTT
         glm::glm
         magic_enum::magic_enum
