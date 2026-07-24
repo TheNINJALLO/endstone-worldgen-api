@@ -123,6 +123,13 @@ jobs:
           ninja --version
           python scripts\build_exact.py --bds "${{ matrix.bds }}" --platform "${{ matrix.platform }}" --parallel 2
 
+      - name: Build test plugin wheel
+        run: |
+          python -m pip install build wheel
+          if [ -d examples/python/world_gen_studio_plugin ]; then
+            python -m build --wheel examples/python/world_gen_studio_plugin -o dist/release
+          fi
+
       - name: Verify release assets
         run: >-
           python scripts/verify_release_assets.py
@@ -188,7 +195,9 @@ jobs:
         working-directory: release-assets
         shell: bash
         run: |
-          find . -maxdepth 1 -type f \( -name '*.dll' -o -name '*.so' -o -name '*.zip' \) -print0             | sort -z             | xargs -0 -r sha256sum > SHA256SUMS.txt
+          find . -maxdepth 1 -type f \( -name '*.dll' -o -name '*.so' -o -name '*.zip' -o -name '*.whl' \) -print0 \
+            | sort -z \
+            | xargs -0 -r sha256sum > SHA256SUMS.txt
           test -s SHA256SUMS.txt
       - name: Create or update GitHub Release
         env:
