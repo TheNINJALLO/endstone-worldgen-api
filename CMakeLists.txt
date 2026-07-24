@@ -120,6 +120,8 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     )
     if(UNIX)
         target_compile_options(worldgen_api PRIVATE -fms-extensions)
+    elseif(WIN32)
+        target_link_options(worldgen_api PRIVATE "/FORCE:UNRESOLVED")
     endif()
 
     install(TARGETS worldgen_api
