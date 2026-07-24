@@ -86,6 +86,9 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
         include
         ${CMAKE_CURRENT_BINARY_DIR}/include
         ${endstone_SOURCE_DIR}/src
+        ${endstone_SOURCE_DIR}/include
+        ${endstone_BINARY_DIR}/include
+        ${endstone_BINARY_DIR}/include/generated
     )
     target_compile_definitions(worldgen_api PRIVATE
         ENDSTONE_WORLDGEN_NATIVE_2630=$<BOOL:${ENDSTONE_WORLDGEN_BUILD_NATIVE_2630}>
