@@ -82,8 +82,8 @@ private:
     std::uint64_t ticks_{};
 };
 
-ENDSTONE_PLUGIN("endstone_worldgen", ENDSTONE_WORLDGEN_VERSION, WorldGenPlugin) {
-    prefix = "WorldGen";
+ENDSTONE_PLUGIN("worldgen_api", ENDSTONE_WORLDGEN_VERSION, WorldGenPlugin) {
+    prefix = "WorldGenAPI";
     description = "Hooked detached world-generation and population service for Endstone";
     website = "https://github.com/TheNINJALLO/endstone-worldgen-api";
     authors = {"Ninj-OS contributors"};
