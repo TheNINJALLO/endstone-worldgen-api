@@ -45,6 +45,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     find_package(glm REQUIRED)
     find_package(magic_enum REQUIRED)
     find_package(Microsoft.GSL REQUIRED)
+    find_package(nlohmann_json REQUIRED)
     find_package(raknet REQUIRED)
 
     include(FetchContent)
@@ -73,7 +74,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
         ENDSTONE_WORLDGEN_NATIVE_2630=$<BOOL:${ENDSTONE_WORLDGEN_BUILD_NATIVE_2630}>
         ENDSTONE_WORLDGEN_BDS_BUILD="${ENDSTONE_BDS_BUILD}"
         ENTT_SPARSE_PAGE=2048
-        ENTT_NO_MIXIN
+        ENTT_NO_MIXIN=1
     )
     target_link_libraries(worldgen_api PRIVATE
         endstone_worldgen_core
@@ -84,6 +85,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
         glm::glm
         magic_enum::magic_enum
         Microsoft.GSL::GSL
+        nlohmann_json::nlohmann_json
         raknet::raknet
     )
     if(UNIX)
