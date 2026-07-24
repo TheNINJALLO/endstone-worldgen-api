@@ -114,6 +114,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     endif()
 
     install(TARGETS worldgen_api
+        DESTINATION plugins
         RUNTIME DESTINATION plugins
         LIBRARY DESTINATION plugins
         ARCHIVE DESTINATION lib
