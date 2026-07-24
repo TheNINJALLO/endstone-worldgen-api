@@ -171,7 +171,7 @@ public:
 
     bool verifySymbols() noexcept override {
         try {
-            return server_.isPrimaryThread() && isSupportedBds2630Build(server_.getMinecraftVersion()) &&
+            return isSupportedBds2630Build(server_.getMinecraftVersion()) &&
                    sizeof(void *) == 8;
         } catch (...) {
             return false;
