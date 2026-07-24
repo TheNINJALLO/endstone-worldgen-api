@@ -114,12 +114,12 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     endif()
 
     install(TARGETS worldgen_api
-        DESTINATION plugins
         RUNTIME DESTINATION plugins
         LIBRARY DESTINATION plugins
         ARCHIVE DESTINATION lib
         COMPONENT worldgen_package
     )
+    install(FILES $<TARGET_FILE:worldgen_api> DESTINATION plugins COMPONENT worldgen_package)
     install(DIRECTORY python/endstone_worldgen DESTINATION python COMPONENT worldgen_package)
     install(DIRECTORY include/endstone_worldgen DESTINATION include COMPONENT worldgen_package)
     install(FILES
