@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "endstone-worldgen-studio"
-version = "0.4.5b25"
+version = "0.4.5b26"
 description = "In-game worldgen, chunk interceptor, and scheduler stress test plugin for Endstone"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -17,3 +17,7 @@ worldgen_studio = "endstone_worldgen_studio:WorldGenStudioPlugin"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.toml"]
+

@@ -59,7 +59,7 @@ class CustomMazeGenerator:
 class WorldGenStudioPlugin(Plugin):
     api_version = "0.4"
     name = "WorldGenStudioPlugin"
-    version = "0.4.5-beta.25"
+    version = "0.4.5-beta.26"
     description = "Interactive In-Game WorldGen, Interceptor, and Scheduler Stress Test Suite"
 
     commands = {
