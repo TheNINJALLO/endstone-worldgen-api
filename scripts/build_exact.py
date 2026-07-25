@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-VERSION = "0.4.5-beta.19"
+VERSION = "0.4.5-beta.22"
 PROJECT = "worldgen"
 PROJECT_SLUG = "endstone-worldgen-api"
 SUPPORTED_BDS = {"1.26.32", "1.26.33"}
