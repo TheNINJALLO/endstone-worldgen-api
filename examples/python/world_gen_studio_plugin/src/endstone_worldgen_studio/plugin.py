@@ -57,9 +57,9 @@ class CustomMazeGenerator:
                         buf.set(x, y, z, 98)
 
 class WorldGenStudioPlugin(Plugin):
-    api_version = "0.4"
+    api_version = "0.5"
     name = "WorldGenStudioPlugin"
-    version = "0.4.5-beta.27"
+    version = "0.4.5-beta.28"
     description = "Interactive In-Game WorldGen, Interceptor, and Scheduler Stress Test Suite"
 
     commands = {
@@ -67,6 +67,12 @@ class WorldGenStudioPlugin(Plugin):
             "description": "WorldGen Studio & Chunk Interceptor Test Suite",
             "usages": ["/wg <gen|structure|benchmark|inspect> [args...]"],
             "permissions": ["wg.admin"],
+        }
+    }
+
+    permissions = {
+        "wg.admin": {
+            "description": "Allows access to WorldGen Studio commands",
             "default": "op",
         }
     }

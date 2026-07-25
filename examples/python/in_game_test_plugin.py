@@ -19,9 +19,9 @@ from endstone_worldgen import (
 )
 
 class WorldGenTestPlugin(Plugin):
-    api_version = "0.4"
+    api_version = "0.5"
     name = "WorldGenTestPlugin"
-    version = "0.4.5-beta.27"
+    version = "0.4.5-beta.28"
     description = "In-game validation test suite for Endstone WorldGen API"
 
     commands = {
@@ -29,6 +29,12 @@ class WorldGenTestPlugin(Plugin):
             "description": "Run in-game validation suite for WorldGen API",
             "usages": ["/testworldgen [chunk_x: int] [chunk_z: int]"],
             "permissions": ["worldgentest.admin"],
+        }
+    }
+
+    permissions = {
+        "worldgentest.admin": {
+            "description": "Allows execution of WorldGen test commands",
             "default": "op",
         }
     }
