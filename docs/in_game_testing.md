@@ -6,7 +6,7 @@ The release includes the `endstone_worldgen_studio` test-plugin wheel.
 
 1. Install the exact native WorldGen bundle for the server's BDS build and platform.
 2. Ensure the bundle's `_endstone_worldgen_live` module is importable by Endstone.
-3. Copy `endstone_worldgen_studio-0.4.5b29-py3-none-any.whl` to `plugins/`.
+3. Copy `endstone_worldgen_studio-0.4.5b30-py3-none-any.whl` to `plugins/`.
 4. Restart Endstone and run `/wg status`.
 
 The wheel registers Endstone entry point `worldgen-studio`, command `/wg`, and

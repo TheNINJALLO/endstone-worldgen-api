@@ -93,8 +93,22 @@ int main() {
     assert(isExpectedBds2630Build("26.33", "1.26.33"));
     assert(!isExpectedBds2630Build("26.32", "1.26.33"));
     assert(isExpectedEndstoneVersion("0.11.6", "0.11.6"));
+    assert(isExpectedEndstoneVersion("v0.11.6", "0.11.6"));
+    assert(isExpectedEndstoneVersion("0.11.6+linux.x86-64", "0.11.6"));
+    assert(isExpectedEndstoneVersion("0.11.6.dev7", "0.11.6"));
+    assert(isExpectedEndstoneVersion("v0.11.6.dev7+linux", "v0.11.6"));
+    assert(isExpectedEndstoneVersion("0.11.6-dev", "0.11.6"));
+    assert(isExpectedEndstoneVersion("0.11.6-dev+linux", "0.11.6"));
+    assert(isExpectedEndstoneVersion("0.11.6-dev.snapshot+linux", "0.11.6"));
     assert(!isExpectedEndstoneVersion("0.11.5", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.6-dev", "0.11.6"));
+    assert(!isExpectedEndstoneVersion("0.11.60", "0.11.6"));
+    assert(!isExpectedEndstoneVersion("0.11.6.1", "0.11.6"));
+    assert(!isExpectedEndstoneVersion("0.11.6-device", "0.11.6"));
+    assert(!isExpectedEndstoneVersion("0.11.6+", "0.11.6"));
+    assert(!isExpectedEndstoneVersion("0.11.6+linux..x64", "0.11.6"));
+    assert(!isExpectedEndstoneVersion("0.11.6.dev", "0.11.6"));
+    assert(!isExpectedEndstoneVersion("0.11.6.dev7+", "0.11.6"));
+    assert(!isExpectedEndstoneVersion("0.11.6-dev.", "0.11.6"));
 
     assert(deterministicStringHash("overworld") == 0xd4447a2733c45e2dULL);
     assert(deterministicStageSeed(1234, "overworld", {2, 3}, GenerationStage::BaseTerrain) ==

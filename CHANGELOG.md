@@ -1,3 +1,10 @@
+## 0.4.5-beta.30
+
+- Validated Endstone 0.11.6 build-metadata and development suffix compatibility while preserving exact BDS 1.26.33 gating and rejecting near-version or malformed suffixes.
+- Added refusal diagnostics that report the raw runtime and compiled expected BDS and Endstone versions.
+- Moved the command-test wheel and exact native bridge to CPython 3.14 with `cp314`/`cpython-314` ABI validation, and synchronized the wheel to `0.4.5b30`.
+- Pinned the wheel runtime, release interpreter, and proven Conan 2.31.1 toolchain so tagged rebuilds cannot silently drift from the supported Endstone 0.11.6 contract.
+
 ## 0.4.5-beta.29
 
 - Removed unsafe Linux Bedrock ABI stubs, linked the matching Endstone tag's implementations, and added build/package symbol and RPATH gates for every native binary.

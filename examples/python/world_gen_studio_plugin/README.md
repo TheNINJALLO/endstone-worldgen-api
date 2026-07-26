@@ -7,11 +7,11 @@ service and runs clearly labeled detached reference-buffer tests.
 
 Install the native WorldGen package matching the server's exact operating
 system and BDS build first. Its `_endstone_worldgen_live` module must be on the
-Endstone Python path, and the Endstone host must run **CPython 3.12** to match
+Endstone Python path, and the Endstone host must run **CPython 3.14** to match
 the native bridge ABI. Then copy this wheel into the server's `plugins/` folder:
 
 ```text
-endstone_worldgen_studio-0.4.5b29-py3-none-any.whl
+endstone_worldgen_studio-0.4.5b30-py3-none-any.whl
 ```
 
 Endstone discovers the `worldgen-studio` entry point at startup. All commands
