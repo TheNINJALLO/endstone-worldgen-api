@@ -2,7 +2,7 @@
 
 ## Downloading an automatic build
 
-Every GitHub push produces downloadable Windows x64 and Linux x64 artifacts for BDS 1.26.32 and 1.26.33. Open the repository's **Actions** tab, select the completed build, and download the package matching your exact BDS version and operating system.
+Every GitHub push produces downloadable Windows x64 and Linux x64 artifacts for BDS 1.26.33 with Endstone v0.11.6. Open the repository's **Actions** tab, select the completed build, and download the package matching your operating system.
 
 A tagged release such as `v0.4.5-beta.29` publishes the same files under the repository's **Releases** page.
 

@@ -6,12 +6,11 @@ Version: **0.4.5-beta.29**
 
 - Portable C++ WorldGen core and tests
 - Python package and tests
-- Exact BDS 1.26.32 / Endstone v0.11.5 adapter source
 - Exact BDS 1.26.33 / Endstone v0.11.6 adapter source
 - Native `ChunkSource` request interception pipeline
 - Detached worker processing and primary-thread commits
 - Deterministic native install and packaging scripts
-- GitHub Actions Windows x64 and Linux x64 exact build matrix
+- GitHub Actions Windows x64 and Linux x64 exact builds for BDS 1.26.33
 - Downloadable workflow artifacts on every push
 - Automatic tagged GitHub Releases
 - Raw plugin, ZIP package, manifest, and SHA-256 outputs

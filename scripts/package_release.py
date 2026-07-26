@@ -19,6 +19,7 @@ PROJECTS = {
     "worldgen": {
         "slug": "endstone-worldgen-api",
         "plugin_prefix": "endstone_worldgen_bds_",
+        "supported_bds": {"1.26.33"},
     },
 }
 SAFE_COMPONENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
@@ -49,6 +50,12 @@ def main() -> int:
         if not SAFE_COMPONENT.fullmatch(value):
             raise SystemExit(f"Invalid {label} value: {value!r}")
     info = PROJECTS[args.project]
+    supported_bds = info.get("supported_bds")
+    if supported_bds is not None and args.bds not in supported_bds:
+        raise SystemExit(
+            f"Unsupported BDS build for {info['slug']}: {args.bds}; "
+            f"expected one of {sorted(supported_bds)}"
+        )
     stage = args.stage.resolve()
     release_dir = args.release_dir.resolve()
     if not stage.is_dir():

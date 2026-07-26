@@ -5,21 +5,6 @@
   "adapter_family": "minecraft-bedrock-26.30",
   "verified_source_adapters": [
     {
-      "bds": "1.26.32",
-      "endstone": "0.11.5",
-      "features": [
-        "exact_chunk_request_hooks",
-        "bounded_native_queue",
-        "detached_chunk_capture",
-        "worker_populator_dispatch",
-        "controlled_chunk_commit",
-        "palette_roundtrip",
-        "chunk_source_probe",
-        "flush_thread_batch",
-        "endstone_service"
-      ]
-    },
-    {
       "bds": "1.26.33",
       "endstone": "0.11.6",
       "features": [

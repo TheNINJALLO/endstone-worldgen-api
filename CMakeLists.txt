@@ -18,7 +18,8 @@ option(ENDSTONE_WORLDGEN_BUILD_PLUGIN "Build Endstone wrapper" OFF)
 option(ENDSTONE_WORLDGEN_BUILD_PYTHON "Build pybind11 module" OFF)
 option(ENDSTONE_WORLDGEN_BUILD_LIVE_PYTHON "Build the exact native status bridge" ON)
 option(ENDSTONE_WORLDGEN_BUILD_NATIVE_2630 "Build exact BDS 26.30-family adapter" ON)
-set(ENDSTONE_BDS_BUILD "1.26.33" CACHE STRING "Exact BDS build: 1.26.32 or 1.26.33")
+set(ENDSTONE_BDS_BUILD "1.26.33" CACHE STRING "Exact BDS build (only 1.26.33 is supported)")
+set_property(CACHE ENDSTONE_BDS_BUILD PROPERTY STRINGS "1.26.33")
 string(REPLACE "." "_" ENDSTONE_BDS_BUILD_FILE "${ENDSTONE_BDS_BUILD}")
 
 add_library(endstone_worldgen_core STATIC
@@ -44,14 +45,11 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
             "Conan dependencies target BDS ${ENDSTONE_CONAN_BDS_BUILD}, but CMake targets ${ENDSTONE_BDS_BUILD}")
     endif()
 
-    if(ENDSTONE_BDS_BUILD STREQUAL "1.26.32")
-        set(ENDSTONE_EXACT_TAG "v0.11.5")
-    elseif(ENDSTONE_BDS_BUILD STREQUAL "1.26.33")
+    if(ENDSTONE_BDS_BUILD STREQUAL "1.26.33")
         set(ENDSTONE_EXACT_TAG "v0.11.6")
-    elseif(ENDSTONE_WORLDGEN_BUILD_NATIVE_2630)
-        message(FATAL_ERROR "Native 26.30 adapter supports only BDS 1.26.32 and 1.26.33")
     else()
-        set(ENDSTONE_EXACT_TAG "v0.11.6")
+        message(FATAL_ERROR
+            "The exact WorldGen adapter supports only BDS 1.26.33 with Endstone v0.11.6")
     endif()
     string(REGEX REPLACE "^v" "" ENDSTONE_EXACT_VERSION "${ENDSTONE_EXACT_TAG}")
 
@@ -64,9 +62,6 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     find_package(date REQUIRED)
     find_package(EnTT REQUIRED)
     find_package(expected-lite REQUIRED)
-    if(ENDSTONE_BDS_BUILD STREQUAL "1.26.32")
-        find_package(fmt REQUIRED)
-    endif()
     find_package(funchook REQUIRED)
     find_package(glm REQUIRED)
     find_package(magic_enum REQUIRED)
@@ -102,11 +97,29 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
         file(WRITE "${endstone_SOURCE_DIR}/src/bedrock/server/commands/command_registry.h" "${ENDSTONE_CMD_REG_CONTENT}")
     endif()
 
-    if(EXISTS "${endstone_SOURCE_DIR}/src/bedrock/platform/result.h")
-        file(READ "${endstone_SOURCE_DIR}/src/bedrock/platform/result.h" ENDSTONE_RESULT_H_CONTENT)
-        string(REPLACE "std::format(\"Error: {}\\nCall stack:{}\", error, call_stack)" "std::string(\"Error: \") + error" ENDSTONE_RESULT_H_CONTENT "${ENDSTONE_RESULT_H_CONTENT}")
-        file(WRITE "${endstone_SOURCE_DIR}/src/bedrock/platform/result.h" "${ENDSTONE_RESULT_H_CONTENT}")
+    set(ENDSTONE_RESULT_H "${endstone_SOURCE_DIR}/src/bedrock/platform/result.h")
+    if(NOT EXISTS "${ENDSTONE_RESULT_H}")
+        message(FATAL_ERROR "Endstone v0.11.6 result.h was not found at ${ENDSTONE_RESULT_H}")
     endif()
+    file(READ "${ENDSTONE_RESULT_H}" ENDSTONE_RESULT_H_CONTENT)
+    string(REPLACE "std::format(\"Error: {}\\nCall stack:{}\", error, call_stack)" "std::string(\"Error: \") + error" ENDSTONE_RESULT_H_CONTENT "${ENDSTONE_RESULT_H_CONTENT}")
+    set(ENDSTONE_RESULT_ERROR_CODE_FORMAT "std::format(\"{}\", error_info.error)")
+    set(ENDSTONE_RESULT_ERROR_CODE_MESSAGE "error_info.error.message()")
+    string(FIND "${ENDSTONE_RESULT_H_CONTENT}" "${ENDSTONE_RESULT_ERROR_CODE_FORMAT}" ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX)
+    string(FIND "${ENDSTONE_RESULT_H_CONTENT}" "${ENDSTONE_RESULT_ERROR_CODE_MESSAGE}" ENDSTONE_RESULT_ERROR_CODE_MESSAGE_INDEX)
+    if(ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX EQUAL -1 AND ENDSTONE_RESULT_ERROR_CODE_MESSAGE_INDEX EQUAL -1)
+        message(FATAL_ERROR
+            "Endstone v0.11.6 result.h no longer contains the expected std::error_code formatting expression")
+    endif()
+    if(NOT ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX EQUAL -1)
+        string(REPLACE
+            "${ENDSTONE_RESULT_ERROR_CODE_FORMAT}"
+            "${ENDSTONE_RESULT_ERROR_CODE_MESSAGE}"
+            ENDSTONE_RESULT_H_CONTENT
+            "${ENDSTONE_RESULT_H_CONTENT}"
+        )
+    endif()
+    file(WRITE "${ENDSTONE_RESULT_H}" "${ENDSTONE_RESULT_H_CONTENT}")
 
     # The adapter includes and passes exact Bedrock-owned types. Link the real
     # implementation from the matching Endstone tag; untyped no-op symbol
@@ -172,9 +185,6 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
         zstr::zstr
         ${CMAKE_DL_LIBS}
     )
-    if(ENDSTONE_BDS_BUILD STREQUAL "1.26.32")
-        target_link_libraries(worldgen_api PRIVATE fmt::fmt)
-    endif()
     if(UNIX)
         target_compile_options(worldgen_api PRIVATE -fms-extensions)
         # Keep the exact private ABI definitions local to this plugin and fail
@@ -234,16 +244,14 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     endif()
 
     install(TARGETS worldgen_api
-        RUNTIME DESTINATION plugins
-        LIBRARY DESTINATION plugins
-        ARCHIVE DESTINATION lib
-        COMPONENT worldgen_package
+        RUNTIME DESTINATION plugins COMPONENT worldgen_package
+        LIBRARY DESTINATION plugins COMPONENT worldgen_package
+        ARCHIVE DESTINATION lib COMPONENT worldgen_package
     )
     if(ENDSTONE_WORLDGEN_BUILD_LIVE_PYTHON)
         install(TARGETS _endstone_worldgen_live
-            RUNTIME DESTINATION python
-            LIBRARY DESTINATION python
-            COMPONENT worldgen_package
+            RUNTIME DESTINATION python COMPONENT worldgen_package
+            LIBRARY DESTINATION python COMPONENT worldgen_package
         )
     endif()
     install(DIRECTORY python/endstone_worldgen DESTINATION python COMPONENT worldgen_package)

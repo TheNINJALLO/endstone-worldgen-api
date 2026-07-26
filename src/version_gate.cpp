@@ -10,7 +10,7 @@ std::string_view canonicalBdsBuild(std::string_view build) noexcept {
 
 bool isSupportedBds2630Build(std::string_view build) noexcept {
     build = canonicalBdsBuild(build);
-    return build == "26.32" || build == "26.33";
+    return build == "26.33";
 }
 
 bool isExpectedBds2630Build(std::string_view runtime_build,

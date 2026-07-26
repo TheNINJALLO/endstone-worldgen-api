@@ -2,9 +2,8 @@
 
 | BDS build | Endstone tag | Runtime result |
 |---|---|---|
-| 1.26.32 | v0.11.5 | accepted |
 | 1.26.33 | v0.11.6 | accepted |
-| supported BDS with any other Endstone version | mismatch | refused |
+| 1.26.33 with any other Endstone version | mismatch | refused |
 | anything else | none | refused |
 
 ## Native hook path
@@ -41,5 +40,3 @@ Load `endstone:worldgen` through Endstone's `ServiceManager` and register one or
 ```bash
 ./scripts/build_exact.sh 1.26.33
 ```
-
-Use `1.26.32` for Endstone v0.11.5.

@@ -81,10 +81,10 @@ public:
 };
 
 int main() {
-    assert(isSupportedBds2630Build("1.26.32"));
     assert(isSupportedBds2630Build("1.26.33"));
-    assert(isSupportedBds2630Build("26.32"));
     assert(isSupportedBds2630Build("26.33"));
+    assert(!isSupportedBds2630Build("1.26.32"));
+    assert(!isSupportedBds2630Build("26.32"));
     assert(!isSupportedBds2630Build(""));
     assert(!isSupportedBds2630Build("1.26.30"));
     assert(!isSupportedBds2630Build("1.26.20"));
@@ -93,7 +93,7 @@ int main() {
     assert(isExpectedBds2630Build("26.33", "1.26.33"));
     assert(!isExpectedBds2630Build("26.32", "1.26.33"));
     assert(isExpectedEndstoneVersion("0.11.6", "0.11.6"));
-    assert(isExpectedEndstoneVersion("v0.11.5", "0.11.5"));
+    assert(!isExpectedEndstoneVersion("0.11.5", "0.11.6"));
     assert(!isExpectedEndstoneVersion("0.11.6-dev", "0.11.6"));
 
     assert(deterministicStringHash("overworld") == 0xd4447a2733c45e2dULL);

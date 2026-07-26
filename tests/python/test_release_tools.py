@@ -21,6 +21,10 @@ class TestReleaseTools(unittest.TestCase):
             text=True,
         )
 
+    def test_project_metadata_and_native_packaging_contract(self):
+        result = self.run_tool("verify_project_metadata.py")
+        self.assertIn("Verified metadata for endstone-worldgen-api", result.stdout)
+
     def test_package_round_trip_and_checksum_tamper_detection(self):
         scratch_root = ROOT / "build" / "release-tool-tests"
         scratch_root.mkdir(parents=True, exist_ok=True)
@@ -183,6 +187,25 @@ class TestReleaseTools(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("Invalid version value", result.stderr + result.stdout)
+
+    def test_rejects_retired_bds_build(self):
+        scratch_root = ROOT / "build" / "release-tool-tests"
+        scratch_root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=scratch_root) as temporary:
+            stage = Path(temporary) / "stage"
+            stage.mkdir()
+            result = self.run_tool(
+                "package_release.py",
+                "--project", CONFIG["project"],
+                "--version", CONFIG["version"],
+                "--bds", "1.26.32",
+                "--platform", "windows-x64",
+                "--stage", str(stage),
+                "--release-dir", str(Path(temporary) / "release"),
+                check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Unsupported BDS build", result.stderr + result.stdout)
 
 
 if __name__ == "__main__":

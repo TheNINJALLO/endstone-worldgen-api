@@ -123,7 +123,7 @@ std::shared_ptr<LevelChunk> getOrLoadChunkDetour(ChunkSource *self, const ::Chun
 
 // ChunkSource has one destructor vtable slot under MSVC and the Itanium ABI has
 // complete + deleting destructor slots. These ordinals are pinned to the exact
-// Endstone v0.11.5/v0.11.6 class declaration and are runtime-gated by BDS build.
+// Endstone v0.11.6 class declaration and are runtime-gated by BDS build.
 #ifdef _WIN32
 inline constexpr int kVtablePrefix = 1; // MSVC complete-object locator
 inline constexpr int kCreateNewChunkOrdinal = 7;
