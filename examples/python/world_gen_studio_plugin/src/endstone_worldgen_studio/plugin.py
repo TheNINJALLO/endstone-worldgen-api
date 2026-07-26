@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import importlib
 import random
 import time
 from typing import Any
@@ -18,6 +17,8 @@ from endstone_worldgen import (
     GenerationScheduler,
     Stage,
 )
+
+from ._bridge_loader import import_live_bridge
 
 
 class CustomIslandGenerator:
@@ -89,7 +90,7 @@ class WorldGenStudioPlugin(Plugin):
     """Exercise the detached WorldGen scheduler and generators from commands."""
 
     api_version = "0.11"
-    version = "0.4.5-beta.30"
+    version = "0.4.5-beta.31"
     description = "Interactive in-game WorldGen scheduler and buffer test suite"
     depend = ["worldgen_api"]
 
@@ -155,8 +156,8 @@ class WorldGenStudioPlugin(Plugin):
 
         if self.live_bridge is None:
             self.logger.error(
-                "WorldGen live bridge unavailable; /wg commands will report unavailable: %s",
-                self.bridge_error,
+                "WorldGen live bridge unavailable; /wg commands will report unavailable: "
+                f"{self.bridge_error}"
             )
         else:
             self.logger.info("WorldGen Studio enabled against the native endstone:worldgen service.")
@@ -164,7 +165,7 @@ class WorldGenStudioPlugin(Plugin):
     def _connect_bridge(self) -> Any | None:
         """Connect to the native service, allowing command-time recovery."""
         try:
-            bridge = importlib.import_module("_endstone_worldgen_live")
+            bridge = import_live_bridge(self.version)
             if not bridge.available(self.server):
                 self.live_bridge = None
                 self.bridge_error = "endstone:worldgen native service is not registered"
@@ -203,7 +204,7 @@ class WorldGenStudioPlugin(Plugin):
         return getattr(self, handler_name)(sender, args[1:])
 
     def _send_help(self, sender: CommandSender) -> None:
-        sender.send_message("§e=== WorldGen Studio Test Plugin (v0.4.5-beta.30) ===")
+        sender.send_message("§e=== WorldGen Studio Test Plugin (v0.4.5-beta.31) ===")
         sender.send_message(
             "§a/wg gen <flat|island|maze|ores> [cx cz] §7- Generate a detached buffer"
         )
@@ -228,7 +229,7 @@ class WorldGenStudioPlugin(Plugin):
             reason = getattr(self, "bridge_error", "native bridge is unavailable")
             sender.send_message(f"§cNative WorldGen service unavailable: {reason}")
             sender.send_message(
-                "§7Install the matching exact native bundle and expose its python/ directory."
+                "§7Install the matching beta.31 platform wheel from the exact BDS bundle."
             )
             return None
         try:
