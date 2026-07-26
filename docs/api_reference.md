@@ -64,3 +64,40 @@ Python and native implementations use the same byte-level contract.
 `stage_seed(context)` uses the same unsigned 64-bit FNV-1a and mixing contract
 as native `deterministicStageSeed`, including native stage ordinals and signed
 chunk coordinates converted to `uint32`.
+
+---
+
+## 4. Native `WorldGenService` live recipe path
+
+### `generateLive(dimension, center, anchor_y, recipe) -> LiveGenerationResult`
+
+Runs one of `flat`, `island`, `maze`, `ores`, `castle`, or `arena` through the
+exact adapter on the Endstone primary thread. `castle` and `arena` target a 3x3
+chunk area; other recipes target one chunk. All target chunks and complete
+runtime palettes are captured before the first write. Recipe descriptors are
+resolved through the running server, only explicitly selected cells change, and
+biomes are never edited.
+
+`anchor_y` is the visible surface/floor for `flat`, `island`, `maze`, `castle`,
+and `arena`. The command wheel supplies `floor(sender.location.y) - 1`. Their
+bounded write bands are respectively `anchor_y-1..anchor_y`,
+`anchor_y-4..anchor_y`, `anchor_y..anchor_y+3`,
+`anchor_y..anchor_y+7`, and `anchor_y..anchor_y+4`. Every captured chunk must
+contain the full band or the request fails before commit. `ores` does not use
+the anchor: it scans the captured vertical range and replaces only natural
+stone/deepslate, so its changes may be underground.
+
+`success` means the request completed. `committed` is true only when every
+changed chunk passed both `commitChunk` and `flushThreadBatch`. A successful
+zero-change request has `committed == false`. `changed_blocks` and
+`changed_chunks` count flush-confirmed changes; `unconfirmed_blocks` reports a
+commit whose subsequent flush failed. `failure` and `message` provide the
+machine-readable and human-readable failure reason. Nullable `min_changed_y`
+and `max_changed_y` bound all flush-confirmed changes plus any commit whose flush
+could not be confirmed. Both are null when no native write range exists.
+
+### `liveStats() -> LiveGenerationStats`
+
+Returns persistent manual-request, success, no-change, descriptor, capture,
+commit, flush, primary-thread rejection, confirmed-block, and unconfirmed-block
+counters. These are separate from automatic `GenerationInterceptor` statistics.

@@ -45,6 +45,11 @@ struct NativeDiagnostics {
     std::uint64_t dropped_requests{};
 };
 
+struct ResolvedBlockDescriptor {
+    std::uint32_t runtime_id{};
+    BlockDescriptor descriptor;
+};
+
 class IVanillaGenerationAdapter {
 public:
     virtual ~IVanillaGenerationAdapter()=default;
@@ -52,6 +57,10 @@ public:
     virtual bool verifySymbols()noexcept=0;
     virtual NativeCapabilities capabilities()const noexcept=0;
     virtual NativeDiagnostics diagnostics()const=0;
+    // Resolve a descriptor through the exact running server before a live
+    // mutation is planned. Callers must not guess or hard-code runtime IDs.
+    virtual std::optional<ResolvedBlockDescriptor> resolveBlock(
+        const std::string &type, const DescriptorStates &states = {})=0;
     virtual std::optional<ChunkBuffer> captureChunk(const std::string&,ChunkPos)=0;
     virtual bool commitChunk(const std::string&,const ChunkBuffer&)=0;
     virtual bool flushThreadBatch(const std::string&)=0;

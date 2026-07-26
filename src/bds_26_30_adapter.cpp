@@ -234,8 +234,27 @@ public:
         return out;
     }
 
+    std::optional<ResolvedBlockDescriptor> resolveBlock(
+        const std::string &type, const DescriptorStates &states) override {
+        if (!verifySymbols() || !server_.isPrimaryThread() || type.empty()) return std::nullopt;
+        endstone::BlockStates native_states;
+        for (const auto &[key, value] : states) {
+            std::visit([&](const auto &v) { native_states[key] = v; }, value);
+        }
+        auto data = server_.createBlockData(type, std::move(native_states));
+        if (!data) return std::nullopt;
+
+        ResolvedBlockDescriptor resolved;
+        resolved.runtime_id = data->getRuntimeId();
+        resolved.descriptor.type = data->getType();
+        for (const auto &[key, value] : data->getBlockStates()) {
+            std::visit([&](const auto &v) { resolved.descriptor.states[key] = v; }, value);
+        }
+        return resolved;
+    }
+
     std::optional<ChunkBuffer> captureChunk(const std::string &dimension_name, ChunkPos pos) override {
-        if (!verifySymbols()) return std::nullopt;
+        if (!verifySymbols() || !server_.isPrimaryThread()) return std::nullopt;
         int origin_x{};
         int origin_z{};
         if (!chunkOrigin(pos.x, origin_x) || !chunkOrigin(pos.z, origin_z)) return std::nullopt;
@@ -256,9 +275,9 @@ public:
                     const int world_x = origin_x + x;
                     const int world_z = origin_z + z;
                     auto block = dimension->getBlockAt(world_x, y, world_z);
-                    if (!block) continue;
+                    if (!block) return std::nullopt;
                     auto data = block->getData();
-                    if (!data) continue;
+                    if (!data) return std::nullopt;
                     const auto id = data->getRuntimeId();
                     buffer.setRuntimeId(x, y, z, id);
                     if (!buffer.paletteEntry(id)) {
@@ -276,7 +295,7 @@ public:
     }
 
     bool commitChunk(const std::string &dimension_name, const ChunkBuffer &buffer) override {
-        if (!verifySymbols()) return false;
+        if (!verifySymbols() || !server_.isPrimaryThread()) return false;
         // Endstone 0.11 has no safe public or verified private biome mutation
         // surface. Reject before touching blocks instead of silently dropping
         // biome cells that are part of the detached buffer fingerprint.
@@ -294,6 +313,14 @@ public:
         // that resolves to a different runtime ID must leave the chunk intact.
         if (!buffer.hasCompletePalette()) return false;
         std::unordered_map<std::uint32_t, std::unique_ptr<endstone::BlockData>> native_palette;
+        using BlockHandle = decltype(dimension->getBlockAt(0, 0, 0));
+        using BlockDataHandle = decltype(dimension->getBlockAt(0, 0, 0)->getData());
+        struct PendingWrite {
+            BlockHandle block;
+            BlockDataHandle original;
+            std::uint32_t runtime_id{};
+        };
+        std::vector<PendingWrite> writes;
         for (std::int64_t y_value = buffer.minY(); y_value <= buffer.maxY(); ++y_value) {
             const auto y = static_cast<int>(y_value);
             for (int z = 0; z < 16; ++z) {
@@ -321,18 +348,43 @@ public:
                     auto block = dimension->getBlockAt(origin_x + x, y, origin_z + z);
                     if (!block) return false;
                     auto current = block->getData();
+                    if (!current) return false;
                     if (current && current->getRuntimeId() == id) continue;
                     const auto it = native_palette.find(id);
                     if (it == native_palette.end()) return false;
-                    block->setData(*it->second, false);
+                    writes.push_back({std::move(block), std::move(current), id});
                 }
             }
+        }
+
+        std::size_t applied{};
+        try {
+            for (auto &write : writes) {
+                const auto replacement = native_palette.find(write.runtime_id);
+                if (replacement == native_palette.end()) return false;
+                write.block->setData(*replacement->second, false);
+                ++applied;
+            }
+        } catch (...) {
+            // Every target and descriptor was preflighted before the first
+            // setter. If a setter itself throws, make a best-effort rollback of
+            // the writes already applied instead of knowingly leaving a prefix.
+            while (applied > 0) {
+                --applied;
+                try {
+                    writes[applied].block->setData(*writes[applied].original, false);
+                } catch (...) {
+                    // The caller receives failure and must treat persistence as
+                    // unconfirmed; there is no stronger public transaction API.
+                }
+            }
+            return false;
         }
         return true;
     }
 
     bool flushThreadBatch(const std::string &dimension_name) override {
-        if (!verifySymbols()) return false;
+        if (!verifySymbols() || !server_.isPrimaryThread()) return false;
         auto *level = server_.getLevel();
         auto *dimension = level ? level->getDimension(dimension_name) : nullptr;
         auto *exact = static_cast<endstone::core::EndstoneDimension *>(dimension);

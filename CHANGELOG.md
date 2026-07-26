@@ -1,3 +1,13 @@
+## 0.4.5-beta.32
+
+- Replaced the misleading detached `/wg gen` and `/wg structure` paths with exact primary-thread live recipes that resolve server BlockData, capture before writing, preserve untouched cells and biomes, and require commit plus flush confirmation before success.
+- Anchored visible live recipes at `floor(sender Y) - 1`, rejected insufficient vertical clearance before commit, and added nullable actual changed-Y bounds to native, bridge, success, no-change, and failure reporting; ore scans remain limited to natural stone/deepslate and may be underground.
+- Moved reference-only generation to `/wg buffer`, kept benchmark/inspect explicitly detached, and fixed negative, partial, malformed, console, and out-of-range target handling.
+- Added live recipe and failure statistics, zero-populator/interception diagnostics, descriptor/capture/commit/flush error reporting, and manual live operation even when automatic interception is unavailable.
+- Versioned the cross-DSO service as `endstone:worldgen:v2` so mixed old/new native plugins and wheels fail lookup safely instead of calling an incompatible virtual interface.
+- Added portable C++ recipe/preflight/commit/flush/anchor-range tests and command-wheel coverage for the exact 12 registered usages, every overload and mode, live confirmation, hook-independent operation, and target validation.
+- Preserved Linux host-resolved Endstone plugin imports while retaining selective build- and release-time rejection of unresolved private Bedrock ABI symbols.
+
 ## 0.4.5-beta.31
 
 - Fixed the Endstone 0.11 logger error call so WorldGen Studio passes one rendered string instead of unsupported logging-style positional arguments.

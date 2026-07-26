@@ -47,17 +47,21 @@ public:
         interceptor_ = std::make_unique<endstone_worldgen::GenerationInterceptor>(
             *adapter_, *scheduler_, static_cast<std::uint64_t>(getServer().getLevel()->getSeed()), config);
 
-        if (!interceptor_->install()) {
-            getLogger().error("The exact ChunkSource hook could not be installed. Worker dispatch will not run.");
-            interceptor_.reset();
-            adapter_.reset();
-            return;
+        const bool interception_installed = interceptor_->install();
+        if (!interception_installed) {
+            getLogger().error(
+                "The exact ChunkSource hook could not be installed. Automatic native-populator dispatch is disabled; "
+                "the primary-thread WorldGenService capture/commit path remains available.");
         }
 
         provider_ = std::make_shared<endstone_worldgen::WorldGenServiceProvider>(*adapter_, *interceptor_);
         getServer().getServiceManager().registerService(
             std::string(endstone_worldgen::WorldGenServiceName), provider_, *this,
             endstone::ServicePriority::Normal);
+
+        getLogger().warning(
+            "No native IPopulator is registered by default. Intercepted chunk requests have no automatic work; "
+            "explicit WorldGenService live recipes remain available.");
 
         getServer().getScheduler().runTaskTimer(*this, [this]() { pump(); }, 1, 1);
     }
@@ -78,10 +82,12 @@ private:
         const auto stats = interceptor_->pump();
         if (++ticks_ % 1200 == 0) {
             const auto diagnostics = adapter_->diagnostics();
-            getLogger().info("intercepted={} dispatched={} committed={} waiting={} inflight={} retries={} native_dropped={} waiting_dropped={} populators={}",
+            getLogger().info("intercepted={} dispatched={} committed={} waiting={} inflight={} retries={} capture_failed={} commit_failed={} empty_pipeline={} native_dropped={} waiting_dropped={} populators={}",
                              diagnostics.intercepted_requests, stats.dispatched, stats.committed,
                              stats.waiting, stats.inflight, stats.capture_retries,
-                             diagnostics.dropped_requests, stats.waiting_overflow_drops,
+                             stats.capture_failures, stats.commit_failures,
+                             stats.empty_pipeline_requests, diagnostics.dropped_requests,
+                             stats.waiting_overflow_drops,
                              interceptor_->populatorCount());
         }
     }
