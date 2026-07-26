@@ -1,11 +1,34 @@
 #pragma once
 #include "endstone_worldgen/generation_interceptor.h"
+#include "endstone_worldgen/live_generation.h"
 #include <endstone/plugin/service.h>
+#include <cstdint>
 #include <memory>
+#include <mutex>
+#include <string>
 #include <string_view>
 
 namespace endstone_worldgen {
-inline constexpr std::string_view WorldGenServiceName = "endstone:worldgen";
+// Service ABI 2 adds synchronous live recipes and statistics. A versioned
+// lookup prevents a bridge built for a different virtual interface from
+// calling the wrong vtable slot across the DSO boundary.
+inline constexpr std::uint32_t WorldGenServiceAbiVersion = 2;
+inline constexpr std::string_view WorldGenServiceName = "endstone:worldgen:v2";
+
+struct LiveGenerationStats {
+    std::uint64_t requests{};
+    std::uint64_t successful_requests{};
+    std::uint64_t committed_requests{};
+    std::uint64_t no_change_requests{};
+    std::uint64_t failed_requests{};
+    std::uint64_t changed_blocks{};
+    std::uint64_t unconfirmed_blocks{};
+    std::uint64_t descriptor_failures{};
+    std::uint64_t capture_failures{};
+    std::uint64_t commit_failures{};
+    std::uint64_t flush_failures{};
+    std::uint64_t primary_thread_rejections{};
+};
 
 // Service registered in Endstone's ServiceManager. Other native plugins can load
 // this interface and register worker-safe populators without linking to the
@@ -19,20 +42,29 @@ public:
     [[nodiscard]] virtual InterceptorStats stats() const = 0;
     [[nodiscard]] virtual NativeDiagnostics diagnostics() const = 0;
     [[nodiscard]] virtual bool interceptionActive() const = 0;
+    [[nodiscard]] virtual LiveGenerationResult generateLive(
+        const std::string &dimension, ChunkPos center, std::int32_t anchor_y,
+        const std::string &recipe) = 0;
+    [[nodiscard]] virtual LiveGenerationStats liveStats() const = 0;
 };
 
 class WorldGenServiceProvider final : public WorldGenService {
 public:
-    WorldGenServiceProvider(IVanillaGenerationAdapter &adapter, GenerationInterceptor &interceptor)
-        : adapter_(adapter), interceptor_(interceptor) {}
-    void registerPopulator(std::shared_ptr<IPopulator> populator) override { interceptor_.addPopulator(std::move(populator)); }
-    void clearPopulators() override { interceptor_.clearPopulators(); }
-    [[nodiscard]] std::size_t populatorCount() const override { return interceptor_.populatorCount(); }
-    [[nodiscard]] InterceptorStats stats() const override { return interceptor_.stats(); }
-    [[nodiscard]] NativeDiagnostics diagnostics() const override { return adapter_.diagnostics(); }
-    [[nodiscard]] bool interceptionActive() const override { return adapter_.diagnostics().interception_installed; }
+    WorldGenServiceProvider(IVanillaGenerationAdapter &adapter, GenerationInterceptor &interceptor);
+    void registerPopulator(std::shared_ptr<IPopulator> populator) override;
+    void clearPopulators() override;
+    [[nodiscard]] std::size_t populatorCount() const override;
+    [[nodiscard]] InterceptorStats stats() const override;
+    [[nodiscard]] NativeDiagnostics diagnostics() const override;
+    [[nodiscard]] bool interceptionActive() const override;
+    [[nodiscard]] LiveGenerationResult generateLive(
+        const std::string &dimension, ChunkPos center, std::int32_t anchor_y,
+        const std::string &recipe) override;
+    [[nodiscard]] LiveGenerationStats liveStats() const override;
 private:
     IVanillaGenerationAdapter &adapter_;
     GenerationInterceptor &interceptor_;
+    mutable std::mutex live_stats_mutex_;
+    LiveGenerationStats live_stats_;
 };
 }

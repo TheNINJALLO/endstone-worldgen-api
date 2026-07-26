@@ -27,6 +27,7 @@ add_library(endstone_worldgen_core STATIC
     src/thread_pool.cpp
     src/generation_scheduler.cpp
     src/generation_interceptor.cpp
+    src/live_generation.cpp
     src/generators.cpp
     src/neighborhood_locks.cpp
     src/version_gate.cpp
@@ -132,7 +133,11 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
         )
     endif()
 
-    set(WORLDGEN_PLUGIN_SOURCES src/plugin.cpp src/native_runtime_bridge.cpp)
+    set(WORLDGEN_PLUGIN_SOURCES
+        src/plugin.cpp
+        src/native_runtime_bridge.cpp
+        src/worldgen_service.cpp
+    )
     if(ENDSTONE_WORLDGEN_BUILD_NATIVE_2630)
         list(APPEND WORLDGEN_PLUGIN_SOURCES src/bds_26_30_adapter.cpp)
     endif()
@@ -187,10 +192,11 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     )
     if(UNIX)
         target_compile_options(worldgen_api PRIVATE -fms-extensions)
-        # Keep the exact private ABI definitions local to this plugin and fail
-        # the link if any required implementation is still absent.
+        # Keep exact private ABI definitions local to this plugin. Endstone's
+        # public plugin ABI is supplied by the host process, so a blanket
+        # --no-undefined link would incorrectly reject those imports. The
+        # post-build gate below rejects unresolved Bedrock ABI symbols.
         target_link_options(worldgen_api PRIVATE "LINKER:--exclude-libs,ALL")
-        target_link_options(worldgen_api PRIVATE -Wl,--no-undefined)
     endif()
 
     if(UNIX AND NOT APPLE)

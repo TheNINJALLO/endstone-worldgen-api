@@ -30,7 +30,7 @@ EXPECTED_COMMANDS = {"wg"}
 EXPECTED_DEPENDENCIES = ["worldgen_api"]
 EXPECTED_PACKAGES = {"endstone_worldgen_studio/", "endstone_worldgen/"}
 EXPECTED_RUNTIME_DEPENDENCIES = ["endstone==0.11.6"]
-EXPECTED_VERSION = "0.4.5b31"
+EXPECTED_VERSION = "0.4.5b32"
 EXPECTED_BRIDGE = "_endstone_worldgen_live"
 SUPPORTED_TAGS = {
     "cp314-cp314-linux_x86_64": (".so", ".cpython-314-", b"\x7fELF"),
@@ -71,7 +71,7 @@ _build_commands(copy.deepcopy(plugin_class.commands))
 _build_permissions(copy.deepcopy(plugin_class.permissions))
 plugin_class()
 bridge = importlib.import_module("endstone_worldgen_studio._endstone_worldgen_live")
-assert {{"available", "status", "clear_populators"}} <= set(dir(bridge))
+assert {{"available", "status", "generate_live", "clear_populators"}} <= set(dir(bridge))
 bridge_path = Path(bridge.__file__).resolve()
 package_path = (Path({json.dumps(str(site_packages))}) / "endstone_worldgen_studio").resolve()
 assert bridge_path.is_relative_to(package_path), (bridge_path, package_path)

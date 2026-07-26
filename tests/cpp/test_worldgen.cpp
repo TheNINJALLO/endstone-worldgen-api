@@ -1,5 +1,6 @@
 #include "endstone_worldgen/generation_interceptor.h"
 #include "endstone_worldgen/generation_scheduler.h"
+#include "endstone_worldgen/live_generation.h"
 #include "endstone_worldgen/bds_26_30_adapter.h"
 #include <atomic>
 #include <cassert>
@@ -8,6 +9,7 @@
 #include <iostream>
 #include <limits>
 #include <thread>
+#include <unordered_map>
 using namespace endstone_worldgen;
 
 class OrePop final : public IPopulator {
@@ -41,18 +43,45 @@ public:
     }
     NativeDiagnostics diagnostics() const override {
         NativeDiagnostics d; d.adapter = "mock"; d.exact_build_match = true;
-        d.interception_installed = installed; d.intercepted_requests = intercepted; return d;
+        d.primary_thread = primary_thread; d.interception_installed = installed;
+        d.intercepted_requests = intercepted; return d;
+    }
+    std::optional<ResolvedBlockDescriptor> resolveBlock(
+        const std::string &type, const DescriptorStates &states = {}) override {
+        if (failed_descriptor && *failed_descriptor == type) return std::nullopt;
+        static const std::unordered_map<std::string, std::uint32_t> ids{
+            {"minecraft:stone", 1},
+            {"minecraft:grass_block", 2},
+            {"minecraft:dirt", 3},
+            {"minecraft:cobblestone", 4},
+            {"minecraft:glass", 5},
+            {"minecraft:gold_block", 6},
+            {"minecraft:diamond_block", 7},
+            {"minecraft:diamond_ore", 42},
+            {"minecraft:deepslate_diamond_ore", 43},
+        };
+        const auto found = ids.find(type);
+        if (found == ids.end()) return std::nullopt;
+        return ResolvedBlockDescriptor{found->second, {type, states}};
     }
     std::optional<ChunkBuffer> captureChunk(const std::string &, ChunkPos pos) override {
         ++capture_count;
         if (failed_capture && *failed_capture == pos) return std::nullopt;
         ChunkBuffer buffer(pos, 0, 15, 1);
-        buffer.setPaletteEntry(1, {"minecraft:stone", {}});
+        if (!incomplete_capture) buffer.setPaletteEntry(1, {"minecraft:stone", {}});
         buffer.setPaletteEntry(42, {"minecraft:diamond_ore", {}});
+        if (existing_flat_y) {
+            buffer.setPaletteEntry(2, {"minecraft:grass_block", {}});
+            for (int x = 3; x <= 12; ++x) {
+                for (int z = 3; z <= 12; ++z) {
+                    buffer.setRuntimeId(x, *existing_flat_y, z, 2);
+                }
+            }
+        }
         return buffer;
     }
     bool commitChunk(const std::string &, const ChunkBuffer &buffer) override {
-        committed = buffer; ++commit_count; return true;
+        committed = buffer; ++commit_count; return commit_succeeds;
     }
     bool flushThreadBatch(const std::string &) override { ++flush_count; return flush_succeeds; }
     bool installChunkRequestInterception(bool include_get_or_load = false) override { installed = true; intercept_loads = include_get_or_load; return true; }
@@ -70,12 +99,17 @@ public:
 
     bool installed{};
     bool intercept_loads{};
+    bool primary_thread{true};
+    bool commit_succeeds{true};
     bool flush_succeeds{true};
+    bool incomplete_capture{};
     std::uint64_t intercepted{};
     int commit_count{};
     int flush_count{};
     int capture_count{};
     std::optional<ChunkPos> failed_capture;
+    std::optional<std::string> failed_descriptor;
+    std::optional<int> existing_flat_y;
     std::optional<ChunkBuffer> committed;
     std::deque<NativeChunkRequest> requests;
 };
@@ -215,6 +249,133 @@ int main() {
     context.stage = GenerationStage::Features;
     auto populated = scheduler.populate(context, std::move(first.chunk), std::make_shared<OrePop>()).get();
     assert(populated.fingerprint != second.fingerprint);
+
+    // Manual live recipes must use descriptors resolved by the exact adapter,
+    // preserve every cell outside their bounded patch, and confirm both commit
+    // and flush before reporting a successful live change.
+    MockNativeAdapter live_adapter;
+    const auto live_flat = generateLive(live_adapter, "overworld", {0, 0}, 8, "flat");
+    assert(live_flat.success);
+    assert(live_flat.committed);
+    assert(live_flat.failure == LiveGenerationFailure::None);
+    assert(live_flat.requested_chunks == 1);
+    assert(live_flat.planned_blocks == 100);
+    assert(live_flat.changed_blocks == 100);
+    assert(live_flat.changed_chunks == 1);
+    assert(live_flat.unconfirmed_blocks == 0);
+    assert(live_flat.has_changed_y_range);
+    assert(live_flat.min_changed_y == 8);
+    assert(live_flat.max_changed_y == 8);
+    assert(live_adapter.commit_count == 1);
+    assert(live_adapter.flush_count == 1);
+    assert(live_adapter.committed.has_value());
+    assert(live_adapter.committed->getRuntimeId(3, 8, 3) == 2);
+    assert(live_adapter.committed->getRuntimeId(0, 8, 0) == 1);
+    assert(live_adapter.committed->biomeCellCount() == 0);
+
+    MockNativeAdapter no_change_adapter;
+    no_change_adapter.existing_flat_y = 8;
+    const auto no_change = generateLive(
+        no_change_adapter, "overworld", {0, 0}, 8, "flat");
+    assert(no_change.success);
+    assert(!no_change.committed);
+    assert(no_change.planned_blocks == 0);
+    assert(no_change.changed_blocks == 0);
+    assert(!no_change.has_changed_y_range);
+    assert(no_change_adapter.commit_count == 0);
+
+    MockNativeAdapter structure_adapter;
+    const auto live_castle = generateLive(structure_adapter, "overworld", {10, -10}, 8, "castle");
+    assert(live_castle.success);
+    assert(live_castle.committed);
+    assert(live_castle.requested_chunks == 9);
+    assert(live_castle.changed_chunks == 9);
+    assert(structure_adapter.capture_count == 9);
+    assert(structure_adapter.commit_count == 9);
+    assert(structure_adapter.flush_count == 9);
+    assert(live_castle.has_changed_y_range);
+    assert(live_castle.min_changed_y == 8);
+    assert(live_castle.max_changed_y == 15);
+
+    MockNativeAdapter wrong_thread_adapter;
+    wrong_thread_adapter.primary_thread = false;
+    const auto wrong_thread = generateLive(wrong_thread_adapter, "overworld", {0, 0}, 8, "flat");
+    assert(!wrong_thread.success);
+    assert(!wrong_thread.committed);
+    assert(wrong_thread.failure == LiveGenerationFailure::WrongThread);
+    assert(wrong_thread_adapter.capture_count == 0);
+
+    MockNativeAdapter descriptor_adapter;
+    descriptor_adapter.failed_descriptor = "minecraft:grass_block";
+    const auto descriptor_failure = generateLive(descriptor_adapter, "overworld", {0, 0}, 8, "flat");
+    assert(!descriptor_failure.success);
+    assert(descriptor_failure.failure == LiveGenerationFailure::DescriptorResolution);
+    assert(descriptor_adapter.capture_count == 0);
+
+    MockNativeAdapter live_capture_adapter;
+    live_capture_adapter.failed_capture = ChunkPos{0, 0};
+    const auto live_capture_failure = generateLive(live_capture_adapter, "overworld", {0, 0}, 8, "flat");
+    assert(!live_capture_failure.success);
+    assert(live_capture_failure.failure == LiveGenerationFailure::Capture);
+    assert(live_capture_adapter.commit_count == 0);
+
+    MockNativeAdapter incomplete_adapter;
+    incomplete_adapter.incomplete_capture = true;
+    const auto incomplete_failure = generateLive(incomplete_adapter, "overworld", {0, 0}, 8, "flat");
+    assert(!incomplete_failure.success);
+    assert(incomplete_failure.failure == LiveGenerationFailure::IncompletePalette);
+    assert(incomplete_adapter.commit_count == 0);
+
+    MockNativeAdapter live_commit_adapter;
+    live_commit_adapter.commit_succeeds = false;
+    const auto live_commit_failure = generateLive(live_commit_adapter, "overworld", {0, 0}, 8, "flat");
+    assert(!live_commit_failure.success);
+    assert(!live_commit_failure.committed);
+    assert(live_commit_failure.failure == LiveGenerationFailure::Commit);
+    assert(live_commit_failure.changed_blocks == 0);
+    assert(live_commit_adapter.flush_count == 0);
+
+    MockNativeAdapter live_flush_adapter;
+    live_flush_adapter.flush_succeeds = false;
+    const auto live_flush_failure = generateLive(live_flush_adapter, "overworld", {0, 0}, 8, "flat");
+    assert(!live_flush_failure.success);
+    assert(!live_flush_failure.committed);
+    assert(live_flush_failure.failure == LiveGenerationFailure::Flush);
+    assert(live_flush_failure.changed_blocks == 0);
+    assert(live_flush_failure.unconfirmed_blocks == live_flush_failure.planned_blocks);
+    assert(live_flush_failure.has_changed_y_range);
+    assert(live_flush_failure.min_changed_y == 8);
+    assert(live_flush_failure.max_changed_y == 8);
+
+    const auto invalid_live_recipe = generateLive(live_adapter, "overworld", {0, 0}, 8, "unknown");
+    assert(!invalid_live_recipe.success);
+    assert(invalid_live_recipe.failure == LiveGenerationFailure::InvalidRecipe);
+
+    MockNativeAdapter low_anchor_adapter;
+    const auto low_anchor = generateLive(low_anchor_adapter, "overworld", {0, 0}, 0, "flat");
+    assert(!low_anchor.success);
+    assert(low_anchor.failure == LiveGenerationFailure::UnsupportedAdapter);
+    assert(low_anchor_adapter.capture_count == 1);
+    assert(low_anchor_adapter.commit_count == 0);
+    assert(!low_anchor.has_changed_y_range);
+
+    MockNativeAdapter high_structure_anchor_adapter;
+    const auto high_structure_anchor = generateLive(
+        high_structure_anchor_adapter, "overworld", {0, 0}, 9, "castle");
+    assert(!high_structure_anchor.success);
+    assert(high_structure_anchor.failure == LiveGenerationFailure::UnsupportedAdapter);
+    assert(high_structure_anchor_adapter.capture_count == 9);
+    assert(high_structure_anchor_adapter.commit_count == 0);
+    assert(!high_structure_anchor.has_changed_y_range);
+
+    MockNativeAdapter ores_adapter;
+    const auto live_ores = generateLive(
+        ores_adapter, "overworld", {0, 0}, 1'000'000, "ores");
+    assert(live_ores.success);
+    assert(live_ores.committed);
+    assert(live_ores.has_changed_y_range);
+    assert(live_ores.min_changed_y >= 1);
+    assert(live_ores.max_changed_y <= 14);
 
     MockNativeAdapter adapter;
     GenerationInterceptor interceptor(adapter, scheduler, 9876);

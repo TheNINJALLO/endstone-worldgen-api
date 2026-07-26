@@ -22,7 +22,7 @@ After BDS completes the original chunk request, the detour records the dimension
 
 ## Service access
 
-Load `endstone:worldgen` through Endstone's `ServiceManager` and register one or more worker-safe `IPopulator` instances. A pipeline with no registered populators intentionally performs no world edits.
+Native clients compiled for service ABI 2 load `endstone:worldgen:v2` through Endstone's `ServiceManager` and register one or more worker-safe `IPopulator` instances. The versioned name makes mixed bridge/native releases fail lookup safely. A pipeline with no registered populators intentionally performs no world edits.
 
 ## Safety
 

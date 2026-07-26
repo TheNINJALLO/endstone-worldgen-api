@@ -1,6 +1,6 @@
 # Build status
 
-Version: **0.4.5-beta.31**
+Version: **0.4.5-beta.32**
 
 ## Implemented
 
@@ -16,6 +16,9 @@ Version: **0.4.5-beta.31**
 - Raw plugin, ZIP package, manifest, and SHA-256 outputs
 - Verified CPython 3.14 platform command wheels with a bundled native status bridge
 - Build-time rejection of unresolved Bedrock ABI symbols and release-time RPATH validation
+- ABI-versioned `endstone:worldgen:v2` service with primary-thread live recipes
+- Commit-and-flush-confirmed `/wg gen` and `/wg structure` command paths anchored
+  at the block below the sender, with exact native changed-Y reporting
 
 ## Validation boundary
 
