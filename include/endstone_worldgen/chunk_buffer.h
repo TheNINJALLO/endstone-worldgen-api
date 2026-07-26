@@ -28,9 +28,11 @@ public:
     void fill(int min_x,int min_y,int min_z,int max_x,int max_y,int max_z,std::uint32_t id);
     void replace(std::uint32_t from,std::uint32_t to);
     void setBiome(int x,int y,int z,std::uint32_t biome);
+    [[nodiscard]] std::size_t biomeCellCount() const noexcept { return biomes_.size(); }
     void setPaletteEntry(std::uint32_t runtime_id, BlockDescriptor descriptor);
     [[nodiscard]] const BlockDescriptor *paletteEntry(std::uint32_t runtime_id) const noexcept;
     [[nodiscard]] std::size_t paletteSize() const noexcept { return palette_.size(); }
+    [[nodiscard]] bool hasCompletePalette() const noexcept;
     [[nodiscard]] std::uint64_t fingerprint() const;
 private:
     size_t index(int x,int y,int z) const;

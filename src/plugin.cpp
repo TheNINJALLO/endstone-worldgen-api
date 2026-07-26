@@ -15,7 +15,8 @@ class WorldGenPlugin : public endstone::Plugin {
 public:
     void onEnable() override {
         const auto hardware = std::thread::hardware_concurrency();
-        const auto workers = hardware > 3 ? hardware - 2 : 1;
+        const auto available_workers = hardware > 3 ? hardware - 2 : 1;
+        const auto workers = std::min(available_workers, 8U);
         scheduler_ = std::make_unique<endstone_worldgen::GenerationScheduler>(workers);
 #if ENDSTONE_WORLDGEN_NATIVE_2630
         adapter_ = endstone_worldgen::makeBds2630WorldGenAdapter(getServer());
@@ -30,8 +31,10 @@ public:
 
         endstone_worldgen::InterceptorConfig config;
         config.max_requests_per_pump = 24;
-        config.max_commits_per_pump = 2;
+        config.max_captures_per_pump = 1;
+        config.max_commits_per_pump = 1;
         config.max_inflight = std::max<std::size_t>(8, scheduler_->workerCount() * 2);
+        config.max_waiting = 256;
         config.capture_retry_ticks = 40;
         config.intercept_get_or_load = false;
         interceptor_ = std::make_unique<endstone_worldgen::GenerationInterceptor>(
@@ -68,10 +71,11 @@ private:
         const auto stats = interceptor_->pump();
         if (++ticks_ % 1200 == 0) {
             const auto diagnostics = adapter_->diagnostics();
-            getLogger().info("intercepted={} dispatched={} committed={} waiting={} inflight={} retries={} dropped={} populators={}",
+            getLogger().info("intercepted={} dispatched={} committed={} waiting={} inflight={} retries={} native_dropped={} waiting_dropped={} populators={}",
                              diagnostics.intercepted_requests, stats.dispatched, stats.committed,
                              stats.waiting, stats.inflight, stats.capture_retries,
-                             diagnostics.dropped_requests, interceptor_->populatorCount());
+                             diagnostics.dropped_requests, stats.waiting_overflow_drops,
+                             interceptor_->populatorCount());
         }
     }
 

@@ -8,7 +8,7 @@ This library provides multi-threaded terrain chunk interception, asynchronous ge
 
 ## 🎯 Quick Navigation
 
-- [🏗️ Architecture & Multi-Threading Model](ARCHITECTURE.md) — Learn about `GenerationScheduler` worker threadpools, uncompressed 3D `ChunkBuffer` memory layout, and BLAKE2b fingerprint verification.
+- [🏗️ Architecture & Multi-Threading Model](ARCHITECTURE.md) — Learn about `GenerationScheduler` worker threadpools, uncompressed 3D `ChunkBuffer` memory layout, and canonical FNV-1a fingerprint verification.
 - [⚙️ Custom Generators & Pipeline Stages](generators_and_stages.md) — Implement custom terrain generators, noise functions, and pipeline stages (`BIOMES`, `BASE_TERRAIN`, `SURFACE`, `CARVERS`, `STRUCTURES`).
 - [🔒 Neighborhood Boundary Lock Engine](neighborhood_locking.md) — Synchronize multi-chunk structure generation across 3x3 chunk boundaries without race conditions or edge tears.
 - [🎮 In-Game Command Suite Guide](in_game_testing.md) — Full reference for the `/wg` command suite and packaged studio plugin wheel.

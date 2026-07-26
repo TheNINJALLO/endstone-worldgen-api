@@ -1,3 +1,12 @@
+## 0.4.5-beta.29
+
+- Removed unsafe Linux Bedrock ABI stubs, linked the matching Endstone tag's implementations, and added build/package symbol and RPATH gates for every native binary.
+- Focused exact native releases on BDS 1.26.33 with Endstone v0.11.6 for Linux and Windows.
+- Enforced the exact compiled BDS version and made chunk-buffer fingerprints cover positions, palettes, biomes, and blocks deterministically.
+- Bounded primary-thread capture and commit dispatch while keeping population work detached.
+- Added the Endstone 0.11 native status bridge, registered and tested every `/wg` command path, and labeled reference-buffer commands accurately.
+- Synchronized release metadata and made CI publish complete ZIP/checksum assets and beta prereleases.
+
 ## 0.4.5-alpha.9
 
 - Replaced one-off private-header downloads with Endstone's Conan dependency graph.
