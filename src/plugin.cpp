@@ -18,14 +18,21 @@ public:
         const auto available_workers = hardware > 3 ? hardware - 2 : 1;
         const auto workers = std::min(available_workers, 8U);
         scheduler_ = std::make_unique<endstone_worldgen::GenerationScheduler>(workers);
+        const auto runtime_bds = getServer().getMinecraftVersion();
+        const auto runtime_endstone = getServer().getVersion();
 #if ENDSTONE_WORLDGEN_NATIVE_2630
         adapter_ = endstone_worldgen::makeBds2630WorldGenAdapter(getServer());
 #endif
-        getLogger().info("WorldGen API {} enabled with {} detached workers; BDS={}",
-                         ENDSTONE_WORLDGEN_VERSION, scheduler_->workerCount(), getServer().getMinecraftVersion());
+        getLogger().info("WorldGen API {} enabled with {} detached workers; BDS={}; Endstone={}",
+                         ENDSTONE_WORLDGEN_VERSION, scheduler_->workerCount(), runtime_bds,
+                         runtime_endstone);
 
         if (!adapter_) {
-            getLogger().error("Exact 26.30 adapter refused this runtime. Chunk interception, capture and commit are disabled.");
+            getLogger().error(
+                "Exact 26.30 adapter refused runtime BDS='{}', Endstone='{}'; expected BDS='{}', Endstone='{}'. "
+                "Chunk interception, capture and commit are disabled.",
+                runtime_bds, runtime_endstone, ENDSTONE_WORLDGEN_BDS_BUILD,
+                ENDSTONE_WORLDGEN_ENDSTONE_VERSION);
             return;
         }
 

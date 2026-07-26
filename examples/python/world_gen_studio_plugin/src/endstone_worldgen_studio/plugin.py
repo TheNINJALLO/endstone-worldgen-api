@@ -89,7 +89,7 @@ class WorldGenStudioPlugin(Plugin):
     """Exercise the detached WorldGen scheduler and generators from commands."""
 
     api_version = "0.11"
-    version = "0.4.5-beta.29"
+    version = "0.4.5-beta.30"
     description = "Interactive in-game WorldGen scheduler and buffer test suite"
     depend = ["worldgen_api"]
 
@@ -203,7 +203,7 @@ class WorldGenStudioPlugin(Plugin):
         return getattr(self, handler_name)(sender, args[1:])
 
     def _send_help(self, sender: CommandSender) -> None:
-        sender.send_message("§e=== WorldGen Studio Test Plugin (v0.4.5-beta.29) ===")
+        sender.send_message("§e=== WorldGen Studio Test Plugin (v0.4.5-beta.30) ===")
         sender.send_message(
             "§a/wg gen <flat|island|maze|ores> [cx cz] §7- Generate a detached buffer"
         )

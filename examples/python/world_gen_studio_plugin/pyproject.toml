@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "endstone-worldgen-studio"
-version = "0.4.5b29"
+version = "0.4.5b30"
 description = "In-game worldgen, chunk interceptor, and scheduler stress test plugin for Endstone"
 readme = "README.md"
-requires-python = "==3.12.*"
+requires-python = "==3.14.*"
 dependencies = [
-    "endstone>=0.11,<0.12",
+    "endstone==0.11.6",
 ]
 
 [project.entry-points."endstone"]
