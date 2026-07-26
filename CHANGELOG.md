@@ -1,3 +1,11 @@
+## 0.4.5-beta.31
+
+- Fixed the Endstone 0.11 logger error call so WorldGen Studio passes one rendered string instead of unsupported logging-style positional arguments.
+- Replaced the universal command wheel with exact-built CPython 3.14 Linux and Windows wheels that bundle `_endstone_worldgen_live` package-locally.
+- Added strict package-local bridge loading that ignores stale top-level extensions and preserves dependency or ABI import failures.
+- Added same-platform relocated-wheel smoke tests plus cross-platform wheel-tag, binary-format, entry-point, command, permission, and packaging validation.
+- Included the matching wheel inside every complete BDS 1.26.33 ZIP and its per-platform checksum contract.
+
 ## 0.4.5-beta.30
 
 - Validated Endstone 0.11.6 build-metadata and development suffix compatibility while preserving exact BDS 1.26.33 gating and rejecting near-version or malformed suffixes.

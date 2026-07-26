@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import logging
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
@@ -46,6 +47,7 @@ sys.path.insert(0, str(ROOT / "python"))
 sys.path.insert(0, str(PLUGIN_SOURCE))
 
 from endstone_worldgen_studio import WorldGenStudioPlugin
+from endstone_worldgen_studio import _bridge_loader as bridge_loader
 from endstone_worldgen import GenerationScheduler
 
 
@@ -92,6 +94,24 @@ class FakeLiveBridge:
         }
 
 
+class StrictLogger:
+    """Match Endstone's one-positional-string logger methods."""
+
+    def __init__(self) -> None:
+        self.errors: list[str] = []
+        self.infos: list[str] = []
+
+    def error(self, message: str) -> None:
+        self.errors.append(message)
+
+    def info(self, message: str) -> None:
+        self.infos.append(message)
+
+
+def missing_module(name: str) -> ModuleNotFoundError:
+    return ModuleNotFoundError(f"No module named {name!r}", name=name)
+
+
 class StudioWheelTests(unittest.TestCase):
     def make_plugin(self) -> tuple[WorldGenStudioPlugin, FakeSender]:
         plugin = WorldGenStudioPlugin()
@@ -132,6 +152,96 @@ class StudioWheelTests(unittest.TestCase):
         self.assertNotIn("[args...]", usages)
         self.assertEqual(WorldGenStudioPlugin.permissions["wg.admin"]["default"], "op")
 
+    def test_endstone_logger_calls_pass_one_rendered_string(self) -> None:
+        plugin_source = (
+            PLUGIN_SOURCE / "endstone_worldgen_studio" / "plugin.py"
+        ).read_text("utf-8")
+        tree = ast.parse(plugin_source)
+        logger_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and isinstance(node.func.value, ast.Attribute)
+            and isinstance(node.func.value.value, ast.Name)
+            and node.func.value.value.id == "self"
+            and node.func.value.attr == "logger"
+        ]
+        self.assertEqual(len(logger_calls), 2)
+        for call in logger_calls:
+            self.assertEqual(len(call.args), 1)
+            self.assertEqual(call.keywords, [])
+
+        plugin = WorldGenStudioPlugin()
+        strict_logger = StrictLogger()
+        plugin.logger = strict_logger
+        with patch(
+            "endstone_worldgen_studio.plugin.import_live_bridge",
+            side_effect=missing_module("_endstone_worldgen_live"),
+        ):
+            plugin.on_enable()
+        self.assertEqual(len(strict_logger.errors), 1)
+        self.assertIn("_endstone_worldgen_live", strict_logger.errors[0])
+
+        enabled_plugin = WorldGenStudioPlugin()
+        enabled_logger = StrictLogger()
+        enabled_plugin.logger = enabled_logger
+        with patch(
+            "endstone_worldgen_studio.plugin.import_live_bridge",
+            return_value=FakeLiveBridge(),
+        ):
+            enabled_plugin.on_enable()
+        self.addCleanup(enabled_plugin.on_disable)
+        self.assertEqual(
+            enabled_logger.infos,
+            ["WorldGen Studio enabled against the native endstone:worldgen service."],
+        )
+
+    def test_bridge_loader_prefers_package_relative_companion(self) -> None:
+        bundled_bridge = object()
+        with patch.object(
+            bridge_loader.importlib,
+            "import_module",
+            return_value=bundled_bridge,
+        ) as import_module:
+            self.assertIs(
+                bridge_loader.import_live_bridge("0.4.5-beta.31"), bundled_bridge
+            )
+        import_module.assert_called_once_with(
+            "endstone_worldgen_studio._endstone_worldgen_live"
+        )
+
+    def test_bridge_loader_does_not_mask_bundled_dependency_failure(self) -> None:
+        dependency_error = missing_module("native_runtime_dependency")
+        with patch.object(
+            bridge_loader.importlib,
+            "import_module",
+            side_effect=dependency_error,
+        ) as import_module:
+            with self.assertRaises(ModuleNotFoundError) as raised:
+                bridge_loader.import_live_bridge("0.4.5-beta.31")
+        self.assertIs(raised.exception, dependency_error)
+        self.assertEqual(import_module.call_count, 1)
+
+    def test_bridge_loader_reports_required_platform_wheel(self) -> None:
+        def import_module(name: str, package: str | None = None):
+            del package
+            raise missing_module(name)
+
+        with patch.object(
+            bridge_loader.importlib,
+            "import_module",
+            side_effect=import_module,
+        ) as imported:
+            with self.assertRaisesRegex(
+                ModuleNotFoundError,
+                "matching 0\\.4\\.5-beta\\.31 CPython 3\\.14 platform wheel",
+            ):
+                bridge_loader.import_live_bridge("0.4.5-beta.31")
+        imported.assert_called_once_with(
+            "endstone_worldgen_studio._endstone_worldgen_live"
+        )
+
     def test_every_registered_handler_and_generator_mode_runs(self) -> None:
         plugin, sender = self.make_plugin()
         command = SimpleNamespace(name="wg")
@@ -158,7 +268,7 @@ class StudioWheelTests(unittest.TestCase):
         plugin.live_bridge = None
         plugin.bridge_error = "module not found"
         with patch(
-            "endstone_worldgen_studio.plugin.importlib.import_module",
+            "endstone_worldgen_studio.plugin.import_live_bridge",
             side_effect=ModuleNotFoundError("module not found"),
         ):
             self.assertTrue(
@@ -177,7 +287,7 @@ class StudioWheelTests(unittest.TestCase):
         self.addCleanup(plugin.on_disable)
 
         with patch(
-            "endstone_worldgen_studio.plugin.importlib.import_module",
+            "endstone_worldgen_studio.plugin.import_live_bridge",
             return_value=bridge,
         ):
             plugin.on_enable()
