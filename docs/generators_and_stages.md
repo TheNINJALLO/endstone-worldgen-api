@@ -15,7 +15,8 @@ Terrain generation executes through the `Stage` enum in sequential order:
 5. `Stage.STRUCTURES`: Multi-chunk structures (dungeons, strongholds, custom arenas).
 6. `Stage.FEATURES`: Ore veins, trees, flora, and scatter features.
 7. `Stage.DECORATION`: Vegetation, snow layers, and fine details.
-8. `Stage.FINALIZATION`: Bedrock chunk injection and lighting.
+8. `Stage.BLOCK_ENTITIES`: Block-entity payload creation after block placement.
+9. `Stage.FINALIZATION`: Bedrock chunk injection and lighting.
 
 ---
 
@@ -34,7 +35,7 @@ class CustomFloatingIslandGenerator:
         self.radius = radius
 
     def generate(self, ctx: GenerationContext, buf: ChunkBuffer):
-        buf.biomes[ctx.chunk] = "end_highlands"
+        buf.set_biome(8, 100, 8, 9)
         for x in range(16):
             for z in range(16):
                 dist = ((x - 8) ** 2 + (z - 8) ** 2) ** 0.5
@@ -51,3 +52,8 @@ class CustomFloatingIslandGenerator:
                         else:
                             buf.set(x, y, z, 1)  # Stone
 ```
+
+`set_biome` modifies detached data and participates in deterministic
+fingerprints. The exact Endstone 0.11 live adapter cannot safely write biome
+cells, so it rejects a buffer containing biome edits before applying its block
+changes. Use biome edits for detached generation and preview workflows only.

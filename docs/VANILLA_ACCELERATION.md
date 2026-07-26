@@ -1,8 +1,8 @@
 # Vanilla and custom generation acceleration
 
-## Active in v0.4.5-alpha.9
+## Active in v0.4.5-beta.29
 
-`PostProcessing` is connected to real BDS chunk requests. Registered custom populators run in parallel over detached chunks and return through a primary-thread commit gate.
+`PostProcessing` is connected to real BDS chunk requests. Registered custom populators run in parallel over detached chunks and return through a primary-thread commit gate. Capture and commit remain on the primary thread and are limited to one chunk of each per pump by default to bound tick work.
 
 ## Not yet claimed
 

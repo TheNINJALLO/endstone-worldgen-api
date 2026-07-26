@@ -1,0 +1,3 @@
+_ZN8endstone6Server8getLevelEv U
+_ZN13ItemStackBaseD2Ev U
+_ZNK8endstone4core17EndstoneDimension9getHandleEv U

@@ -1,11 +1,15 @@
 #pragma once
+#include <cstddef>
 #include <condition_variable>
 #include <cstdint>
 #include <functional>
 #include <future>
 #include <mutex>
 #include <queue>
+#include <stdexcept>
 #include <thread>
+#include <type_traits>
+#include <utility>
 #include <vector>
 namespace endstone_worldgen {
 class ThreadPool {

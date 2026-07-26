@@ -18,6 +18,11 @@ void GenerationInterceptor::disable() noexcept{
     std::scoped_lock lock(mutex_);
     if(installed_)adapter_.disableChunkRequestInterception();
     installed_=false;
+    waiting_.clear();
+    pending_.clear();
+    active_keys_.clear();
+    stats_.waiting=0;
+    stats_.inflight=0;
 }
 void GenerationInterceptor::addPopulator(std::shared_ptr<IPopulator> populator){
     if(!populator)return;
@@ -38,6 +43,7 @@ void GenerationInterceptor::ingestRequests(){
         }
         auto key=keyOf(request);
         if(active_keys_.contains(key)){++stats_.deduplicated;continue;}
+        if(waiting_.size()>=config_.max_waiting){++stats_.waiting_overflow_drops;continue;}
         active_keys_.insert(key);
         waiting_.push_back({std::move(request),0});
     }
@@ -48,16 +54,23 @@ void GenerationInterceptor::dispatchWaiting(){
         for(const auto &entry:waiting_)active_keys_.erase(keyOf(entry.request));
         waiting_.clear();stats_.waiting=0;return;
     }
-    for(auto it=waiting_.begin();it!=waiting_.end()&&pending_.size()<config_.max_inflight;){
-        auto captured=adapter_.captureChunk(it->request.dimension,it->request.position);
+    std::size_t captures_now=0;
+    const auto candidates=waiting_.size();
+    while(captures_now<candidates&&pending_.size()<config_.max_inflight&&
+          captures_now<config_.max_captures_per_pump&&!waiting_.empty()){
+        ++captures_now;
+        auto entry=std::move(waiting_.front());
+        waiting_.pop_front();
+        auto captured=adapter_.captureChunk(entry.request.dimension,entry.request.position);
         if(!captured){
-            ++it->attempts;++stats_.capture_retries;
-            if(it->attempts>=config_.capture_retry_ticks){active_keys_.erase(keyOf(it->request));it=waiting_.erase(it);++stats_.capture_failures;}else ++it;
+            ++entry.attempts;++stats_.capture_retries;
+            if(entry.attempts>=config_.capture_retry_ticks){active_keys_.erase(keyOf(entry.request));++stats_.capture_failures;}
+            else waiting_.push_back(std::move(entry));
             continue;
         }
-        GenerationContext context{world_seed_,it->request.dimension,it->request.position,GenerationStage::Decoration,0};
+        GenerationContext context{world_seed_,entry.request.dimension,entry.request.position,GenerationStage::Decoration,0};
         auto future=scheduler_.populatePipeline(std::move(context),std::move(*captured),populators_,config_.priority);
-        pending_.push_back({it->request,std::move(future)});it=waiting_.erase(it);++stats_.dispatched;
+        pending_.push_back({std::move(entry.request),std::move(future)});++stats_.dispatched;
     }
     stats_.waiting=waiting_.size();stats_.inflight=pending_.size();
 }
@@ -69,7 +82,7 @@ void GenerationInterceptor::commitReady(){
         try{
             auto result=it->future.get();
             ok=adapter_.commitChunk(it->request.dimension,result.chunk);
-            if(ok) adapter_.flushThreadBatch(it->request.dimension);
+            if(ok) ok=adapter_.flushThreadBatch(it->request.dimension);
         }catch(...){ok=false;}
         if(ok)++stats_.committed;else ++stats_.commit_failures;
         active_keys_.erase(keyOf(it->request));it=pending_.erase(it);++committed_now;

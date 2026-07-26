@@ -28,11 +28,13 @@ struct NativeCapabilities {
     bool exact_vtable_hooks{};
     bool detached_worker_dispatch{};
     bool primary_thread_commit_gate{};
+    bool biome_edits{};
 };
 
 struct NativeDiagnostics {
     std::string adapter;
     std::string runtime_build;
+    std::string runtime_endstone_version;
     bool exact_build_match{};
     bool primary_thread{};
     bool chunk_source_available{};

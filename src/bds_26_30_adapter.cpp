@@ -10,6 +10,7 @@
 #include <deque>
 #include <exception>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -25,6 +26,16 @@ std::pair<int, int> heightRange(endstone::Dimension::Type type) {
     case endstone::Dimension::Type::TheEnd: return {0, 255};
     default: return {-64, 319};
     }
+}
+
+bool chunkOrigin(std::int32_t chunk, int &origin) noexcept {
+    const auto value = static_cast<std::int64_t>(chunk) * 16;
+    if (value < std::numeric_limits<int>::min() ||
+        value > static_cast<std::int64_t>(std::numeric_limits<int>::max()) - 15) {
+        return false;
+    }
+    origin = static_cast<int>(value);
+    return true;
 }
 
 struct HookQueue {
@@ -171,7 +182,8 @@ public:
 
     bool verifySymbols() noexcept override {
         try {
-            return isSupportedBds2630Build(server_.getMinecraftVersion()) &&
+            return isExpectedBds2630Build(server_.getMinecraftVersion(), ENDSTONE_WORLDGEN_BDS_BUILD) &&
+                   isExpectedEndstoneVersion(server_.getVersion(), ENDSTONE_WORLDGEN_ENDSTONE_VERSION) &&
                    sizeof(void *) == 8;
         } catch (...) {
             return false;
@@ -188,6 +200,7 @@ public:
         c.exact_vtable_hooks = true;
         c.detached_worker_dispatch = true;
         c.primary_thread_commit_gate = true;
+        c.biome_edits = false;
         // Registered custom population/post-processing is actually dispatched
         // to detached workers. Mojang's opaque base-terrain generator is not
         // called from foreign threads by this adapter.
@@ -201,7 +214,11 @@ public:
         auto out = diagnostics_;
         out.adapter = "bds-26.30-exact-hooked";
         out.runtime_build = server_.getMinecraftVersion();
-        out.exact_build_match = isSupportedBds2630Build(out.runtime_build);
+        out.runtime_endstone_version = server_.getVersion();
+        out.exact_build_match =
+            isExpectedBds2630Build(out.runtime_build, ENDSTONE_WORLDGEN_BDS_BUILD) &&
+            isExpectedEndstoneVersion(out.runtime_endstone_version,
+                                      ENDSTONE_WORLDGEN_ENDSTONE_VERSION);
         out.primary_thread = server_.isPrimaryThread();
         out.intercepted_requests = queue_->intercepted.load(std::memory_order_relaxed);
         out.dropped_requests = queue_->dropped.load(std::memory_order_relaxed);
@@ -219,6 +236,9 @@ public:
 
     std::optional<ChunkBuffer> captureChunk(const std::string &dimension_name, ChunkPos pos) override {
         if (!verifySymbols()) return std::nullopt;
+        int origin_x{};
+        int origin_z{};
+        if (!chunkOrigin(pos.x, origin_x) || !chunkOrigin(pos.z, origin_z)) return std::nullopt;
         auto *level = server_.getLevel();
         auto *dimension = level ? level->getDimension(dimension_name) : nullptr;
         auto *exact = static_cast<endstone::core::EndstoneDimension *>(dimension);
@@ -233,8 +253,8 @@ public:
         for (int y = min_y; y <= max_y; ++y) {
             for (int z = 0; z < 16; ++z) {
                 for (int x = 0; x < 16; ++x) {
-                    const int world_x = pos.x * 16 + x;
-                    const int world_z = pos.z * 16 + z;
+                    const int world_x = origin_x + x;
+                    const int world_z = origin_z + z;
                     auto block = dimension->getBlockAt(world_x, y, world_z);
                     if (!block) continue;
                     auto data = block->getData();
@@ -257,33 +277,53 @@ public:
 
     bool commitChunk(const std::string &dimension_name, const ChunkBuffer &buffer) override {
         if (!verifySymbols()) return false;
+        // Endstone 0.11 has no safe public or verified private biome mutation
+        // surface. Reject before touching blocks instead of silently dropping
+        // biome cells that are part of the detached buffer fingerprint.
+        if (buffer.biomeCellCount() != 0) return false;
+        int origin_x{};
+        int origin_z{};
+        if (!chunkOrigin(buffer.position().x, origin_x) ||
+            !chunkOrigin(buffer.position().z, origin_z)) return false;
         auto *level = server_.getLevel();
         auto *dimension = level ? level->getDimension(dimension_name) : nullptr;
         if (!dimension) return false;
 
+        // Resolve the complete detached palette before the first live block is
+        // changed. A missing descriptor, an invalid state set, or a descriptor
+        // that resolves to a different runtime ID must leave the chunk intact.
+        if (!buffer.hasCompletePalette()) return false;
         std::unordered_map<std::uint32_t, std::unique_ptr<endstone::BlockData>> native_palette;
-        for (int y = buffer.minY(); y <= buffer.maxY(); ++y) {
+        for (std::int64_t y_value = buffer.minY(); y_value <= buffer.maxY(); ++y_value) {
+            const auto y = static_cast<int>(y_value);
             for (int z = 0; z < 16; ++z) {
                 for (int x = 0; x < 16; ++x) {
                     const auto id = buffer.getRuntimeId(x, y, z);
-                    auto block = dimension->getBlockAt(buffer.position().x * 16 + x, y,
-                                                       buffer.position().z * 16 + z);
+                    if (native_palette.contains(id)) continue;
+                    const auto *descriptor = buffer.paletteEntry(id);
+                    if (!descriptor) return false;
+                    endstone::BlockStates states;
+                    for (const auto &[key, value] : descriptor->states) {
+                        std::visit([&](const auto &v) { states[key] = v; }, value);
+                    }
+                    auto data = server_.createBlockData(descriptor->type, std::move(states));
+                    if (!data || data->getRuntimeId() != id) return false;
+                    native_palette.emplace(id, std::move(data));
+                }
+            }
+        }
+
+        for (std::int64_t y_value = buffer.minY(); y_value <= buffer.maxY(); ++y_value) {
+            const auto y = static_cast<int>(y_value);
+            for (int z = 0; z < 16; ++z) {
+                for (int x = 0; x < 16; ++x) {
+                    const auto id = buffer.getRuntimeId(x, y, z);
+                    auto block = dimension->getBlockAt(origin_x + x, y, origin_z + z);
                     if (!block) return false;
                     auto current = block->getData();
                     if (current && current->getRuntimeId() == id) continue;
-
-                    auto it = native_palette.find(id);
-                    if (it == native_palette.end()) {
-                        const auto *descriptor = buffer.paletteEntry(id);
-                        if (!descriptor) return false;
-                        endstone::BlockStates states;
-                        for (const auto &[key, value] : descriptor->states) {
-                            std::visit([&](const auto &v) { states[key] = v; }, value);
-                        }
-                        auto data = server_.createBlockData(descriptor->type, std::move(states));
-                        if (!data) return false;
-                        it = native_palette.emplace(id, std::move(data)).first;
-                    }
+                    const auto it = native_palette.find(id);
+                    if (it == native_palette.end()) return false;
                     block->setData(*it->second, false);
                 }
             }
@@ -317,8 +357,9 @@ public:
                 if (!exact) continue;
                 auto *source = &exact->getHandle().getBlockSourceFromMainChunkSource().getChunkSource();
                 std::scoped_lock lock(g_hook_mutex);
-                if (g_source_bindings.contains(source)) {
-                    ++bound;
+                if (const auto found = g_source_bindings.find(source); found != g_source_bindings.end()) {
+                    if (found->second.queue.lock() == queue_) ++bound;
+                    else queue_->dropped.fetch_add(1, std::memory_order_relaxed);
                     continue;
                 }
                 SourceBinding binding;
@@ -326,7 +367,17 @@ public:
                     queue_->dropped.fetch_add(1, std::memory_order_relaxed);
                     continue;
                 }
-                g_source_bindings.emplace(source, std::move(binding));
+                auto **original_vtable = binding.original_vtable;
+                auto **shadow_vtable = binding.shadow_vtable;
+                try {
+                    g_source_bindings.emplace(source, std::move(binding));
+                } catch (...) {
+                    // The object's vptr already points at binding's shadow.
+                    // Restore it before the shadow allocation is destroyed.
+                    auto ***object_vptr = reinterpret_cast<void ***>(source);
+                    if (*object_vptr == shadow_vtable) *object_vptr = original_vtable;
+                    throw;
+                }
                 ++bound;
             }
         } catch (...) {

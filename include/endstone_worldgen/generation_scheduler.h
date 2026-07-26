@@ -15,6 +15,8 @@ public:
  std::future<GenerationResult> populatePipeline(GenerationContext context,ChunkBuffer chunk,
      std::vector<std::shared_ptr<IPopulator>> populators,JobPriority priority=JobPriority::Background);
  [[nodiscard]] size_t workerCount()const noexcept{return pool_.workerCount();}
-private:ThreadPool pool_;NeighborhoodLockManager locks_;
+// Members are destroyed in reverse declaration order. Stop and join the pool
+// before destroying the lock manager used by queued population jobs.
+private:NeighborhoodLockManager locks_;ThreadPool pool_;
 };
 }

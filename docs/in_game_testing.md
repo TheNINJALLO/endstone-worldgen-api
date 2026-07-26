@@ -1,33 +1,39 @@
-# In-Game Command & Studio Suite
+# In-game command and studio suite
 
-The repository includes a standalone Python wheel test plugin [`endstone_worldgen_studio`](../examples/python/world_gen_studio_plugin/).
+The release includes the `endstone_worldgen_studio` test-plugin wheel.
 
----
+## Install
 
-## 📦 Installation
+1. Install the exact native WorldGen bundle for the server's BDS build and platform.
+2. Ensure the bundle's `_endstone_worldgen_live` module is importable by Endstone.
+3. Copy `endstone_worldgen_studio-0.4.5b29-py3-none-any.whl` to `plugins/`.
+4. Restart Endstone and run `/wg status`.
 
-```bash
-pip install endstone_worldgen_studio-0.4.5a9-py3-none-any.whl
-```
+The wheel registers Endstone entry point `worldgen-studio`, command `/wg`, and
+permission `wg.admin` with operator default.
 
----
+## Commands
 
-## 🎮 Command Usage (`/wg`)
+### `/wg status`
 
-All subcommands require OP permission or `wg.admin`.
+Displays native interception state, populator count, queue state, and adapter counters.
 
-### 1. `/wg gen <flat|island|maze|ores> [cx] [cz]`
-Submits terrain chunk generation task using specified custom generator.
-- **Example**: `/wg gen island 0 0`
+### `/wg gen <flat|island|maze|ores> [cx cz]`
 
-### 2. `/wg structure <castle|arena> [cx] [cz]`
-Tests neighborhood locking across a 3x3 chunk boundary grid around target coordinates.
-- **Example**: `/wg structure castle 0 0`
+Runs a detached Python reference generator and reports its fingerprint.
 
-### 3. `/wg benchmark [chunk_count]`
-Runs parallel multi-threaded stress test across N chunks and reports throughput (chunks/second), memory usage, and thread safety.
-- **Example**: `/wg benchmark 100`
+### `/wg structure <castle|arena> [cx cz]`
 
-### 4. `/wg inspect [cx] [cz]`
-Displays chunk min/max Y, surface blocks, bedrock blocks, and BLAKE2b fingerprint hash.
-- **Example**: `/wg inspect 0 0`
+Runs a detached 3x3 reference-buffer test.
+
+### `/wg benchmark [chunk_count]`
+
+Benchmarks up to 128 detached reference buffers.
+
+### `/wg inspect [cx cz]`
+
+Displays reference-buffer bounds, block probes, fingerprint, and native counters.
+
+The generation, structure, benchmark, and buffer-inspection commands do not
+commit blocks to the live world. They run only after the native bridge confirms
+that `endstone:worldgen` is active, and explicitly label their detached scope.

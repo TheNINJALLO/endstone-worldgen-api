@@ -1,7 +1,7 @@
 {
   "schema": 3,
   "project": "endstone-worldgen-api",
-  "api": "0.4.1",
+  "api": "0.4.5",
   "adapter_family": "minecraft-bedrock-26.30",
   "verified_source_adapters": [
     {
@@ -37,5 +37,5 @@
   ],
   "vanilla_stage_interception": "chunk_request_interception_active; custom post-processing parallel; opaque Mojang base-terrain stages remain primary-owned",
   "default_mode": "post_processing",
-  "policy": "exact build verification and vanilla fallback"
+  "policy": "exact runtime BDS build and mapped Endstone version verification with vanilla fallback"
 }

@@ -4,6 +4,7 @@
 |---|---|---|
 | 1.26.32 | v0.11.5 | accepted |
 | 1.26.33 | v0.11.6 | accepted |
+| supported BDS with any other Endstone version | mismatch | refused |
 | anything else | none | refused |
 
 ## Native hook path
@@ -14,10 +15,10 @@ After BDS completes the original chunk request, the detour records the dimension
 
 1. Drains the bounded native queue.
 2. Deduplicates repeated chunk requests.
-3. Captures a palette-preserving detached `ChunkBuffer`.
+3. Captures a palette-preserving detached `ChunkBuffer` on the primary thread (one per pump by default).
 4. Sends registered populators to the worker pool.
 5. Waits without blocking the server tick.
-6. Commits changed blocks on the primary thread.
+6. Rejects biome edits, resolves and verifies every used palette descriptor, then commits changed blocks on the primary thread (one per pump by default).
 7. Calls `ChunkSource::flushThreadBatch()`.
 
 ## Service access
@@ -27,10 +28,11 @@ Load `endstone:worldgen` through Endstone's `ServiceManager` and register one or
 ## Safety
 
 - Live BDS pointers never enter worker jobs.
-- The queue is bounded.
+- The native hook queue and interceptor waiting queue are bounded. Waiting
+  overflow is reported through `waiting_overflow_drops`.
 - In-flight requests are bounded and deduplicated.
 - Captures retry when the requested chunk is not ready yet.
-- Commits have a per-tick budget.
+- Captures and commits have separate per-tick budgets. Raising them may increase tick latency.
 - Exact runtime gating rejects unsupported builds.
 - The adapter restores its exact vtable entries when the final interceptor instance is disabled.
 

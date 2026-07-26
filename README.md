@@ -1,16 +1,16 @@
 # Endstone WorldGen API
 
-[![Version](https://img.shields.io/badge/version-v0.4.5--beta.28-blue.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.5-beta.28)
+[![Version](https://img.shields.io/badge/version-v0.4.5--beta.29-blue.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.5-beta.29)
 [![Endstone](https://img.shields.io/badge/Endstone-v0.11.5%20%7C%20v0.11.6-emerald.svg?style=for-the-badge)](https://github.com/EndstoneMC/endstone)
 [![BDS Version](https://img.shields.io/badge/BDS-1.26.32%20%7C%201.26.33-purple.svg?style=for-the-badge)](https://www.minecraft.net/en-us/download/server/bedrock)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/actions)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-orange.svg?style=for-the-badge)](#-direct-release-downloads-v045-beta28)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-orange.svg?style=for-the-badge)](#-direct-release-downloads-v045-beta29)
 [![Language](https://img.shields.io/badge/language-C%2B%2B20%20%7C%20Python-3776AB.svg?style=for-the-badge)](#-c--python-api-quickstart)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green.svg?style=for-the-badge)](LICENSE)
 
-A high-performance, detached **Chunk Interceptor**, **Parallel Generation**, and **Scheduler** API for Endstone Bedrock Dedicated Servers (BDS).
+A high-performance **Chunk Interceptor**, detached **Parallel Generation**, and **Scheduler** API for Endstone Bedrock Dedicated Servers (BDS).
 
-Designed for off-main-thread world pre-generation, custom noise samplers, structure placement, and zero-tick chunk modification without causing server lag or thread deadlocks.
+Generator and populator work runs off the main thread. Live chunk capture and world commit remain on the primary thread and are limited to one of each per server tick by default.
 
 ---
 
@@ -20,15 +20,21 @@ Comprehensive guides, architecture diagrams, stress testing tutorials, and full 
 
 ---
 
-## 📦 Direct Release Downloads (`v0.4.5-beta.28`)
+## 📦 Direct Release Downloads (`v0.4.5-beta.29`)
+
+Use the **complete ZIP** matching the server's exact BDS build and platform when installing the `/wg` wheel; it contains the native plugin and `_endstone_worldgen_live` bridge. The raw library downloads are for C++-only/manual installations and do not contain that bridge.
 
 | Platform | BDS Version | Artifact Filename | Direct Download |
 | :--- | :--- | :--- | :--- |
-| **Windows x64** | `1.26.32` | `endstone-worldgen-api-v0.4.5-beta.28-bds-1.26.32-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.28/endstone-worldgen-api-v0.4.5-beta.28-bds-1.26.32-windows-x64.dll) |
-| **Windows x64** | `1.26.33` | `endstone-worldgen-api-v0.4.5-beta.28-bds-1.26.33-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.28/endstone-worldgen-api-v0.4.5-beta.28-bds-1.26.33-windows-x64.dll) |
-| **Linux x64** | `1.26.32` | `endstone-worldgen-api-v0.4.5-beta.28-bds-1.26.32-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.28/endstone-worldgen-api-v0.4.5-beta.28-linux-x64.so) |
-| **Linux x64** | `1.26.33` | `endstone-worldgen-api-v0.4.5-beta.28-bds-1.26.33-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.28/endstone-worldgen-api-v0.4.5-beta.28-bds-1.26.33-linux-x64.so) |
-| **Python Wheel** | `Universal` | `endstone_worldgen_studio-0.4.5b28-py3-none-any.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.28/endstone_worldgen_studio-0.4.5b28-py3-none-any.whl) |
+| **Windows x64 ZIP (recommended)** | `1.26.32` | `endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.32-windows-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.32-windows-x64.zip) |
+| **Windows x64 ZIP (recommended)** | `1.26.33` | `endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.33-windows-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.33-windows-x64.zip) |
+| **Linux x64 ZIP (recommended)** | `1.26.32` | `endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.32-linux-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.32-linux-x64.zip) |
+| **Linux x64 ZIP (recommended)** | `1.26.33` | `endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.33-linux-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.33-linux-x64.zip) |
+| **Windows x64 raw plugin** | `1.26.32` | `endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.32-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.32-windows-x64.dll) |
+| **Windows x64 raw plugin** | `1.26.33` | `endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.33-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.33-windows-x64.dll) |
+| **Linux x64 raw plugin** | `1.26.32` | `endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.32-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.32-linux-x64.so) |
+| **Linux x64 raw plugin** | `1.26.33` | `endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.33-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone-worldgen-api-v0.4.5-beta.29-bds-1.26.33-linux-x64.so) |
+| **Python Wheel** | `CPython 3.12` | `endstone_worldgen_studio-0.4.5b29-py3-none-any.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5-beta.29/endstone_worldgen_studio-0.4.5b29-py3-none-any.whl) |
 
 ---
 
@@ -40,7 +46,7 @@ graph TD
     B -->|Submit Task| C[GenerationScheduler ThreadPool]
     C -->|Worker Thread 1..N| D[Custom Generator / Noise Engine]
     D -->|Populate Array| E[ChunkBuffer 3D Array]
-    E -->|BLAKE2b Fingerprint| F[Fingerprint Verification]
+    E -->|Deterministic FNV-1a Fingerprint| F[Fingerprint Verification]
     C -->|Neighborhood Lock Manager| G[Cross-Chunk Boundary Sync]
     G -->|Apply to Bedrock Chunk| H[Vanilla World Chunk Injection]
 ```
@@ -76,13 +82,26 @@ scheduler.close()
 
 ### C++ API Example
 ```cpp
-#include <endstone_worldgen/endstone_adapter.h>
+#include <endstone_worldgen/worldgen_service.h>
 #include <endstone/endstone.hpp>
+#include <memory>
+#include <string>
+#include <utility>
 
-void generateTerrainAsync(endstone::Server& server) {
-    auto* scheduler = server.getServiceManager().getService<endstone_worldgen::GenerationScheduler>();
-    if (scheduler) {
-        // Submit terrain generation pipeline
+void registerPopulator(
+    endstone::Server &server,
+    std::shared_ptr<endstone_worldgen::IPopulator> populator) {
+    using namespace endstone_worldgen;
+    auto worldgen = server.getServiceManager().load<WorldGenService>(
+        std::string(WorldGenServiceName));
+    if (!worldgen) return;
+
+    const auto diagnostics = worldgen->diagnostics();
+    const auto stats = worldgen->stats();
+    server.getLogger().info("WorldGen: committed={}, waiting={}",
+                            stats.committed, stats.waiting);
+    if (diagnostics.exact_build_match && worldgen->interceptionActive()) {
+        worldgen->registerPopulator(std::move(populator));
     }
 }
 ```
@@ -91,20 +110,24 @@ void generateTerrainAsync(endstone::Server& server) {
 
 ## 🎮 In-Game Studio Test Suite (`/wg`)
 
-The repository includes a packaged Python wheel studio plugin [`endstone_worldgen_studio`](examples/python/world_gen_studio_plugin/):
+The repository includes a packaged Python wheel studio plugin [`endstone_worldgen_studio`](examples/python/world_gen_studio_plugin/). The wheel and its ABI-tagged native bridge require the Endstone host to run **CPython 3.12**. It calls the exact bundle's `_endstone_worldgen_live` bridge, so expose the extracted bundle's `python/` directory to Endstone before installing the wheel (or copy that directory's contents into Endstone's Python `site-packages`):
 
 ```bash
-# Installation via pip in Endstone Python environment:
-pip install endstone_worldgen_studio-0.4.5a9-py3-none-any.whl
+# Use the python/ directory from the same OS and BDS build as the native plugin.
+export PYTHONPATH=/path/to/extracted/exact-bundle/python${PYTHONPATH:+:$PYTHONPATH}
+
+# Place the command-test wheel in the Endstone server's plugins/ directory.
+cp endstone_worldgen_studio-0.4.5b29-py3-none-any.whl /path/to/endstone/plugins/
 ```
 
 ### In-Game Command Reference
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| `/wg gen <flat\|island\|maze>` | `/wg gen island 0 0` | Submits terrain chunk generation task using specified custom generator. |
-| `/wg structure <castle\|arena>` | `/wg structure castle 0 0` | Tests neighborhood locking across a 3x3 chunk boundary grid. |
-| `/wg benchmark [chunk_count]` | `/wg benchmark 100` | Runs multi-threaded stress test across N chunks and reports chunks/sec throughput. |
-| `/wg inspect [cx] [cz]` | `/wg inspect 0 0` | Displays chunk min/max Y, surface blocks, and BLAKE2b fingerprint hash. |
+| `/wg status` | `/wg status` | Displays live native interceptor, queue, and adapter counters. |
+| `/wg gen <flat\|island\|maze\|ores>` | `/wg gen island 0 0` | Runs a detached reference-buffer generator after checking the native service. |
+| `/wg structure <castle\|arena>` | `/wg structure castle 0 0` | Runs a detached 3x3 reference-buffer test. |
+| `/wg benchmark [chunk_count]` | `/wg benchmark 100` | Benchmarks up to 128 detached Python reference buffers. |
+| `/wg inspect [cx] [cz]` | `/wg inspect 0 0` | Displays a reference buffer alongside live native counters. |
 
 ---
 
@@ -123,4 +146,4 @@ Full technical documentation, architecture deep dives, and API reference manuals
 
 ## 📜 License
 
-Distributed under the [MIT License](LICENSE).
+Distributed under the [Apache License 2.0](LICENSE).
