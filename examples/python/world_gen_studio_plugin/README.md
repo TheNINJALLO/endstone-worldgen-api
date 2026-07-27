@@ -11,8 +11,8 @@ system and BDS build, then copy the matching platform wheel into the server's
 or manual `site-packages` copy is required. Endstone must run **CPython 3.14**.
 
 ```text
-endstone_worldgen_studio-0.4.5b32-cp314-cp314-linux_x86_64.whl
-endstone_worldgen_studio-0.4.5b32-cp314-cp314-win_amd64.whl
+endstone_worldgen_studio-0.4.5-cp314-cp314-linux_x86_64.whl
+endstone_worldgen_studio-0.4.5-cp314-cp314-win_amd64.whl
 ```
 
 Endstone discovers the `worldgen-studio` entry point at startup. All commands

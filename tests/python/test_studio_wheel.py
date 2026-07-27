@@ -294,7 +294,7 @@ class StudioWheelTests(unittest.TestCase):
             return_value=bundled_bridge,
         ) as import_module:
             self.assertIs(
-                bridge_loader.import_live_bridge("0.4.5-beta.32"), bundled_bridge
+                bridge_loader.import_live_bridge("0.4.5"), bundled_bridge
             )
         import_module.assert_called_once_with(
             "endstone_worldgen_studio._endstone_worldgen_live"
@@ -308,7 +308,7 @@ class StudioWheelTests(unittest.TestCase):
             side_effect=dependency_error,
         ) as import_module:
             with self.assertRaises(ModuleNotFoundError) as raised:
-                bridge_loader.import_live_bridge("0.4.5-beta.32")
+                bridge_loader.import_live_bridge("0.4.5")
         self.assertIs(raised.exception, dependency_error)
         self.assertEqual(import_module.call_count, 1)
 
@@ -324,9 +324,9 @@ class StudioWheelTests(unittest.TestCase):
         ) as imported:
             with self.assertRaisesRegex(
                 ModuleNotFoundError,
-                "matching 0\\.4\\.5-beta\\.32 CPython 3\\.14 platform wheel",
+                "matching 0\\.4\\.5 CPython 3\\.14 platform wheel",
             ):
-                bridge_loader.import_live_bridge("0.4.5-beta.32")
+                bridge_loader.import_live_bridge("0.4.5")
         imported.assert_called_once_with(
             "endstone_worldgen_studio._endstone_worldgen_live"
         )
