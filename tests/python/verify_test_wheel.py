@@ -30,7 +30,7 @@ EXPECTED_COMMANDS = {"wg"}
 EXPECTED_DEPENDENCIES = ["worldgen_api"]
 EXPECTED_PACKAGES = {"endstone_worldgen_studio/", "endstone_worldgen/"}
 EXPECTED_RUNTIME_DEPENDENCIES = ["endstone==0.11.6"]
-EXPECTED_VERSION = "0.4.5"
+EXPECTED_VERSION = "0.4.6"
 EXPECTED_BRIDGE = "_endstone_worldgen_live"
 SUPPORTED_TAGS = {
     "cp314-cp314-linux_x86_64": (".so", ".cpython-314-", b"\x7fELF"),

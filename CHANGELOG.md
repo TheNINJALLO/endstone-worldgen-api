@@ -1,3 +1,9 @@
+## 0.4.6
+
+- Added `/wg menu` and made bare `/wg` open a single guarded player form that navigates every live recipe, structure, detached-buffer, benchmark, inspect, status, and help command.
+- Added strict form-result validation, stale-callback and duplicate-form suppression, permission rechecks, lifecycle cleanup, back navigation, and confirmation before live world writes.
+- Kept typed commands and console help fully available while adding route, malformed-input, close, send-failure, quit, death, and command-registration regression coverage to the CPython 3.14 test wheel.
+
 ## 0.4.5
 
 - Promoted the beta.32 feature set to the stable 0.4.5 release without changing the BDS 1.26.33, Endstone 0.11.6, API 0.4.5, or service ABI v2 contracts.

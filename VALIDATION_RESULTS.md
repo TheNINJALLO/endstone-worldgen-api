@@ -1,13 +1,13 @@
 # Validation results
 
-Validated on 2026-07-26:
+Validated on 2026-07-27:
 
 - Portable MSVC Release configuration and C++20 build
 - CTest WorldGen suite (3/3)
-- Python unit, release-tool, metadata, native source-guard, command, live-bridge, strict logger, and bridge-loader tests (31/31)
+- Python unit, release-tool, metadata, native source-guard, command, form-navigation, live-bridge, strict logger, and bridge-loader tests (40/40; 37 command-route subtests)
 - Platform-wheel contracts for entry points, native-plugin dependencies, commands,
   permissions, CPython 3.14 tags, package-local bridges, binary magic, and RECORD integrity
-- Project/version/dependency metadata consistency for `0.4.5`
+- Project/version/dependency metadata consistency for `0.4.6`
 - GitHub Actions YAML parsing
 - Release packaging round-trip with a synthetic Windows plugin stage
 - Checksum, ZIP path, manifest, native bridge, unresolved Bedrock symbol,

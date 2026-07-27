@@ -11,8 +11,8 @@ system and BDS build, then copy the matching platform wheel into the server's
 or manual `site-packages` copy is required. Endstone must run **CPython 3.14**.
 
 ```text
-endstone_worldgen_studio-0.4.5-cp314-cp314-linux_x86_64.whl
-endstone_worldgen_studio-0.4.5-cp314-cp314-win_amd64.whl
+endstone_worldgen_studio-0.4.6-cp314-cp314-linux_x86_64.whl
+endstone_worldgen_studio-0.4.6-cp314-cp314-win_amd64.whl
 ```
 
 Endstone discovers the `worldgen-studio` entry point at startup. All commands
@@ -20,13 +20,20 @@ require operator status or the `wg.admin` permission.
 
 ## Commands
 
-- `/wg`: show help.
+- `/wg` or `/wg menu`: open the guarded player menu; the console receives text
+  help.
 - `/wg status`: display live-recipe, interceptor, queue, failure, and native adapter counters.
 - `/wg gen <flat|island|maze|ores> [cx cz]`: apply one bounded live recipe.
 - `/wg structure <castle|arena> [cx cz]`: apply a bounded live recipe across a 3x3 chunk area.
 - `/wg buffer <flat|island|maze|ores> [cx cz]`: run one detached Python reference generator.
 - `/wg benchmark [chunk_count]`: benchmark the detached Python scheduler (maximum 128).
 - `/wg inspect [cx cz]`: inspect a detached reference buffer.
+
+Only one WorldGen form can be active per player. Child pages navigate back on
+close, and live generation or structure writes require a separate confirmation.
+Strict response validation, UUID-scoped stale-callback suppression, permission
+rechecks, and quit/death/shutdown cleanup prevent duplicate forms or repeated
+world writes.
 
 `gen` and `structure` capture every target chunk on the primary thread, resolve
 the recipe's namespaced `BlockData` descriptors against the exact server, alter
