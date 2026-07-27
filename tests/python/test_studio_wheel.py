@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import ast
+import inspect
+import json
 import logging
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
@@ -8,6 +10,7 @@ import sys
 import tomllib
 import unittest
 from unittest.mock import patch
+from uuid import UUID, uuid4
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,12 +21,18 @@ PLUGIN_SOURCE = PLUGIN_PROJECT / "src"
 def install_endstone_test_double() -> None:
     endstone_module = ModuleType("endstone")
     command_module = ModuleType("endstone.command")
+    event_module = ModuleType("endstone.event")
+    form_module = ModuleType("endstone.form")
     plugin_module = ModuleType("endstone.plugin")
 
     class Plugin:
         def __init__(self) -> None:
             self.server = object()
             self.logger = logging.getLogger(type(self).__name__)
+            self.registered_listeners: list[object] = []
+
+        def register_events(self, listener: object) -> None:
+            self.registered_listeners.append(listener)
 
     class Command:
         def __init__(self, name: str):
@@ -32,23 +41,185 @@ def install_endstone_test_double() -> None:
     class CommandSender:
         pass
 
+    class Event:
+        pass
+
+    class PlayerQuitEvent(Event):
+        def __init__(self, player) -> None:
+            self.player = player
+
+    class PlayerDeathEvent(Event):
+        def __init__(self, player) -> None:
+            self.player = player
+
+    def event_handler(func):
+        func._is_event_handler = True
+        func._priority = 0
+        func._ignore_cancelled = False
+        return func
+
+    class Button:
+        def __init__(self, text="", icon=None, on_click=None) -> None:
+            self.text = text
+            self.icon = icon
+            self.on_click = on_click
+
+    class Divider:
+        pass
+
+    class Header:
+        def __init__(self, label="") -> None:
+            self.label = label
+
+    class Label:
+        def __init__(self, text="") -> None:
+            self.text = text
+
+    class Dropdown:
+        def __init__(self, label="", options=None, default_index=None) -> None:
+            self.label = label
+            self.options = list(options or [])
+            self.default_index = default_index
+
+    class Slider:
+        def __init__(
+            self, label="", min=0, max=100, step=20, default_value=None
+        ) -> None:
+            self.label = label
+            self.min = min
+            self.max = max
+            self.step = step
+            self.default_value = default_value
+
+    class StepSlider(Dropdown):
+        pass
+
+    class TextInput:
+        def __init__(self, label="", placeholder="", default_value=None) -> None:
+            self.label = label
+            self.placeholder = placeholder
+            self.default_value = default_value
+
+    class Toggle:
+        def __init__(self, label="", default_value=False) -> None:
+            self.label = label
+            self.default_value = default_value
+
+    class ActionForm:
+        def __init__(
+            self,
+            title="",
+            content="",
+            buttons=None,
+            on_submit=None,
+            on_close=None,
+        ) -> None:
+            self.title = title
+            self.content = content
+            self._controls = list(buttons or [])
+            self.on_submit = on_submit
+            self.on_close = on_close
+
+        @property
+        def controls(self):
+            return list(self._controls)
+
+        @controls.setter
+        def controls(self, value) -> None:
+            self._controls = list(value)
+
+        def add_button(self, text, icon=None, on_click=None):
+            self._controls.append(Button(text, icon, on_click))
+            return self
+
+        def add_label(self, text):
+            self._controls.append(Label(text))
+            return self
+
+        def add_header(self, text):
+            self._controls.append(Header(text))
+            return self
+
+        def add_divider(self):
+            self._controls.append(Divider())
+            return self
+
+    class ModalForm:
+        def __init__(
+            self,
+            title="",
+            controls=None,
+            submit_button=None,
+            icon=None,
+            on_submit=None,
+            on_close=None,
+        ) -> None:
+            self.title = title
+            self._controls = list(controls or [])
+            self.submit_button = submit_button
+            self.icon = icon
+            self.on_submit = on_submit
+            self.on_close = on_close
+
+        @property
+        def controls(self):
+            return list(self._controls)
+
+        @controls.setter
+        def controls(self, value) -> None:
+            self._controls = list(value)
+
+        def add_control(self, control):
+            self._controls.append(control)
+            return self
+
     plugin_module.Plugin = Plugin
     command_module.Command = Command
     command_module.CommandSender = CommandSender
+    event_module.Event = Event
+    event_module.PlayerQuitEvent = PlayerQuitEvent
+    event_module.PlayerDeathEvent = PlayerDeathEvent
+    event_module.event_handler = event_handler
+    for form_class in (
+        ActionForm,
+        Button,
+        Divider,
+        Dropdown,
+        Header,
+        Label,
+        ModalForm,
+        Slider,
+        StepSlider,
+        TextInput,
+        Toggle,
+    ):
+        setattr(form_module, form_class.__name__, form_class)
     endstone_module.plugin = plugin_module
     endstone_module.command = command_module
+    endstone_module.event = event_module
+    endstone_module.form = form_module
     sys.modules["endstone"] = endstone_module
     sys.modules["endstone.plugin"] = plugin_module
     sys.modules["endstone.command"] = command_module
+    sys.modules["endstone.event"] = event_module
+    sys.modules["endstone.form"] = form_module
 
 
 install_endstone_test_double()
 sys.path.insert(0, str(ROOT / "python"))
 sys.path.insert(0, str(PLUGIN_SOURCE))
 
-from endstone_worldgen_studio import WorldGenStudioPlugin
-from endstone_worldgen_studio import _bridge_loader as bridge_loader
-from endstone_worldgen import GenerationScheduler
+from endstone_worldgen_studio import WorldGenStudioPlugin  # noqa: E402
+from endstone_worldgen_studio import _bridge_loader as bridge_loader  # noqa: E402
+from endstone_worldgen import GenerationScheduler  # noqa: E402
+from endstone.event import Event, PlayerDeathEvent, PlayerQuitEvent  # noqa: E402
+from endstone.form import (  # noqa: E402
+    ActionForm,
+    Dropdown,
+    ModalForm,
+    TextInput,
+    Toggle,
+)
 
 
 class FakeSender:
@@ -63,6 +234,27 @@ class FakeSender:
 
     def send_message(self, message: str) -> None:
         self.messages.append(message)
+
+
+class FakePlayerSender(FakeSender):
+    def __init__(self, unique_id: UUID | None = None) -> None:
+        super().__init__()
+        self.unique_id = unique_id or uuid4()
+        self.is_valid = True
+        self.is_dead = False
+        self.permission_granted = True
+        self.permission_checks: list[str] = []
+        self.sent_forms: list[object] = []
+        self.send_form_error: Exception | None = None
+
+    def has_permission(self, permission: str) -> bool:
+        self.permission_checks.append(permission)
+        return self.permission_granted
+
+    def send_form(self, form) -> None:
+        if self.send_form_error is not None:
+            raise self.send_form_error
+        self.sent_forms.append(form)
 
 
 class FakeLiveBridge:
@@ -185,12 +377,13 @@ class StudioWheelTests(unittest.TestCase):
         self.assertEqual(command["permissions"], ["wg.admin"])
         self.assertEqual(
             set(WorldGenStudioPlugin._SUBCOMMAND_HANDLERS),
-            {"gen", "structure", "buffer", "benchmark", "inspect", "status"},
+            {"menu", "gen", "structure", "buffer", "benchmark", "inspect", "status"},
         )
         self.assertEqual(
             command["usages"],
             [
                 "/wg",
+                "/wg (menu)<action: WorldGenMenuAction>",
                 (
                     "/wg (gen)<action: WorldGenGenerateAction> "
                     "(flat|island|maze|ores)<generator: WorldGenGenerator>"
@@ -232,6 +425,341 @@ class StudioWheelTests(unittest.TestCase):
             ],
         )
         self.assertEqual(WorldGenStudioPlugin.permissions["wg.admin"]["default"], "op")
+
+    def test_event_handlers_have_runtime_types_and_are_registered(self) -> None:
+        for handler_name in ("on_player_quit", "on_player_death"):
+            handler = getattr(WorldGenStudioPlugin, handler_name)
+            annotation = inspect.signature(handler).parameters["event"].annotation
+            self.assertTrue(inspect.isclass(annotation))
+            self.assertTrue(issubclass(annotation, Event))
+            self.assertTrue(getattr(handler, "_is_event_handler", False))
+
+        plugin = WorldGenStudioPlugin()
+        with patch(
+            "endstone_worldgen_studio.plugin.import_live_bridge",
+            return_value=FakeLiveBridge(),
+        ):
+            plugin.on_enable()
+        self.addCleanup(plugin.on_disable)
+        self.assertEqual(plugin.registered_listeners, [plugin])
+
+    def test_player_menu_entrypoints_lock_once_and_console_keeps_help(self) -> None:
+        plugin, _sender = self.make_plugin()
+        command = SimpleNamespace(name="wg")
+        console = FakeSender()
+
+        self.assertTrue(plugin.on_command(console, command, []))
+        self.assertTrue(any("WorldGen Studio Test Plugin" in m for m in console.messages))
+        self.assertTrue(plugin.on_command(console, command, ["menu"]))
+        self.assertTrue(any("only available to players" in m for m in console.messages))
+
+        player = FakePlayerSender()
+        self.assertTrue(plugin.on_command(player, command, []))
+        self.assertEqual(len(player.sent_forms), 1)
+        root_form = player.sent_forms[-1]
+        self.assertIsInstance(root_form, ActionForm)
+        self.assertEqual(len(root_form.controls), 6)
+        self.assertTrue(all(button.on_click is None for button in root_form.controls))
+        self.assertIn(player.unique_id, plugin.active_forms)
+
+        self.assertTrue(plugin.on_command(player, command, ["menu"]))
+        self.assertEqual(len(player.sent_forms), 1)
+        self.assertTrue(any("already open" in m for m in player.messages))
+
+        root_form.on_close(player)
+        self.assertNotIn(player.unique_id, plugin.active_forms)
+        self.assertTrue(plugin.on_command(player, command, ["menu"]))
+        self.assertEqual(len(player.sent_forms), 2)
+        player.sent_forms[-1].on_close(player)
+
+        self.assertTrue(plugin.on_command(player, command, ["menu", "extra"]))
+        self.assertTrue(any("Usage: /wg menu" in m for m in player.messages))
+
+    def test_main_menu_routes_every_command_group(self) -> None:
+        plugin, _sender = self.make_plugin()
+        routes = (
+            (0, "_open_recipe_form", "gen"),
+            (1, "_open_recipe_form", "structure"),
+            (2, "_open_recipe_form", "buffer"),
+            (3, "_open_benchmark_form", None),
+            (4, "_open_inspect_form", None),
+            (5, "_handle_status", []),
+        )
+        for selection, method_name, extra in routes:
+            with self.subTest(selection=selection):
+                player = FakePlayerSender()
+                self.assertTrue(plugin._open_main_menu(player))
+                root_form = player.sent_forms[-1]
+                with patch.object(plugin, method_name) as routed:
+                    root_form.on_submit(player, selection)
+                if method_name == "_open_recipe_form":
+                    routed.assert_called_once_with(player, extra)
+                elif method_name == "_handle_status":
+                    routed.assert_called_once_with(player, [])
+                else:
+                    routed.assert_called_once_with(player)
+                self.assertNotIn(player.unique_id, plugin.active_forms)
+
+        player = FakePlayerSender()
+        self.assertTrue(plugin._open_main_menu(player))
+        invalid_form = player.sent_forms[-1]
+        invalid_form.on_submit(player, True)
+        self.assertEqual(len(player.sent_forms), 2)
+        self.assertTrue(any("invalid button selection" in m for m in player.messages))
+
+    def test_live_menu_requires_confirmation_and_dispatches_every_recipe_once(self) -> None:
+        plugin, _sender = self.make_plugin()
+        bridge = plugin.live_bridge
+        self.assertIsInstance(bridge, FakeLiveBridge)
+
+        for command_name, recipes in (
+            ("gen", plugin._GENERATOR_RECIPES),
+            ("structure", plugin._STRUCTURE_RECIPES),
+        ):
+            for recipe_index, recipe in enumerate(recipes):
+                with self.subTest(command=command_name, recipe=recipe):
+                    player = FakePlayerSender()
+                    self.assertTrue(plugin._open_recipe_form(player, command_name))
+                    modal = player.sent_forms[-1]
+                    self.assertIsInstance(modal, ModalForm)
+                    self.assertEqual(
+                        [type(control) for control in modal.controls],
+                        [Dropdown, Toggle, TextInput, TextInput],
+                    )
+                    handler_name = plugin._SUBCOMMAND_HANDLERS[command_name]
+                    original_handler = getattr(plugin, handler_name)
+                    before_writes = len(bridge.generate_calls)
+                    with patch.object(
+                        plugin, handler_name, wraps=original_handler
+                    ) as handler:
+                        modal.on_submit(
+                            player,
+                            json.dumps([recipe_index, False, "4", "-7"]),
+                        )
+                        handler.assert_not_called()
+                        self.assertEqual(len(bridge.generate_calls), before_writes)
+                        confirmation = player.sent_forms[-1]
+                        self.assertIsInstance(confirmation, ActionForm)
+                        self.assertIn("Confirm Live World Write", confirmation.title)
+                        self.assertTrue(
+                            all(button.on_click is None for button in confirmation.controls)
+                        )
+
+                        # A duplicate response from the replaced modal is stale and inert.
+                        modal.on_submit(
+                            player,
+                            json.dumps([recipe_index, False, "4", "-7"]),
+                        )
+                        self.assertIs(player.sent_forms[-1], confirmation)
+                        confirmation.on_submit(player, 0)
+                        handler.assert_called_once_with(player, [recipe, "4", "-7"])
+                        self.assertEqual(len(bridge.generate_calls), before_writes + 1)
+                        self.assertEqual(
+                            bridge.generate_calls[-1][1:],
+                            ("overworld", 4, -7, 69, recipe),
+                        )
+
+                        # A duplicate confirmation cannot repeat a live write.
+                        confirmation.on_submit(player, 0)
+                        self.assertEqual(len(bridge.generate_calls), before_writes + 1)
+
+        player = FakePlayerSender()
+        self.assertTrue(plugin._open_recipe_form(player, "gen"))
+        modal = player.sent_forms[-1]
+        original_handler = plugin._handle_gen
+        with patch.object(plugin, "_handle_gen", wraps=original_handler) as handler:
+            modal.on_submit(player, json.dumps([0, True, "ignored", "ignored"]))
+            player.sent_forms[-1].on_submit(player, 0)
+        handler.assert_called_once_with(player, ["flat"])
+        self.assertEqual(bridge.generate_calls[-1][2:4], (2, -1))
+
+    def test_live_confirmation_back_and_cancel_never_write(self) -> None:
+        plugin, _sender = self.make_plugin()
+        bridge = plugin.live_bridge
+        self.assertIsInstance(bridge, FakeLiveBridge)
+        player = FakePlayerSender()
+
+        self.assertTrue(plugin._open_recipe_form(player, "gen"))
+        recipe_form = player.sent_forms[-1]
+        recipe_form.on_submit(player, json.dumps([0, False, "1", "2"]))
+        confirmation = player.sent_forms[-1]
+        confirmation.on_submit(player, 1)
+        self.assertIsInstance(player.sent_forms[-1], ModalForm)
+        self.assertEqual(bridge.generate_calls, [])
+
+        # Cancelling a child form navigates back without invoking a command.
+        player.sent_forms[-1].on_close(player)
+        self.assertIsInstance(player.sent_forms[-1], ActionForm)
+        self.assertEqual(len(player.sent_forms[-1].controls), 6)
+        self.assertEqual(bridge.generate_calls, [])
+        player.sent_forms[-1].on_close(player)
+
+        self.assertTrue(plugin._open_recipe_form(player, "structure"))
+        player.sent_forms[-1].on_submit(player, json.dumps([1, True, "", ""]))
+        confirmation = player.sent_forms[-1]
+        confirmation.on_close(player)
+        self.assertIsInstance(player.sent_forms[-1], ModalForm)
+        self.assertEqual(bridge.generate_calls, [])
+
+    def test_detached_menu_forms_delegate_exact_handler_args(self) -> None:
+        plugin, _sender = self.make_plugin()
+
+        for recipe_index, recipe in enumerate(plugin._GENERATOR_RECIPES):
+            with self.subTest(buffer=recipe):
+                player = FakePlayerSender()
+                self.assertTrue(plugin._open_recipe_form(player, "buffer"))
+                with patch.object(plugin, "_handle_buffer") as handler:
+                    player.sent_forms[-1].on_submit(
+                        player,
+                        json.dumps([recipe_index, False, "-8", "9"]),
+                    )
+                handler.assert_called_once_with(player, [recipe, "-8", "9"])
+
+        for response, expected in (
+            ([True, "not-used"], []),
+            ([False, "1"], ["1"]),
+            ([False, "128"], ["128"]),
+        ):
+            with self.subTest(benchmark=response):
+                player = FakePlayerSender()
+                self.assertTrue(plugin._open_benchmark_form(player))
+                with patch.object(plugin, "_handle_benchmark") as handler:
+                    player.sent_forms[-1].on_submit(player, json.dumps(response))
+                handler.assert_called_once_with(player, expected)
+
+        for response, expected in (
+            ([True, "", ""], []),
+            (
+                [False, "-134217728", "134217727"],
+                ["-134217728", "134217727"],
+            ),
+        ):
+            with self.subTest(inspect=response):
+                player = FakePlayerSender()
+                self.assertTrue(plugin._open_inspect_form(player))
+                with patch.object(plugin, "_handle_inspect") as handler:
+                    player.sent_forms[-1].on_submit(player, json.dumps(response))
+                handler.assert_called_once_with(player, expected)
+
+    def test_modal_responses_are_strictly_validated_and_fail_closed(self) -> None:
+        plugin, _sender = self.make_plugin()
+        invalid_responses = (
+            [0, True, "", ""],
+            "{",
+            "{}",
+            json.dumps([0, True, ""]),
+            json.dumps([True, True, "", ""]),
+            json.dumps([4, True, "", ""]),
+            json.dumps([0, 1, "", ""]),
+            json.dumps([0, False, 1, "2"]),
+            json.dumps([0, False, "", "2"]),
+            json.dumps([0, False, "bad", "2"]),
+            json.dumps([0, False, "134217728", "0"]),
+        )
+        for response in invalid_responses:
+            with self.subTest(response=response):
+                player = FakePlayerSender()
+                self.assertTrue(plugin._open_recipe_form(player, "buffer"))
+                with patch.object(plugin, "_handle_buffer") as handler:
+                    player.sent_forms[-1].on_submit(player, response)
+                handler.assert_not_called()
+                self.assertEqual(len(player.sent_forms), 2)
+                self.assertIn(player.unique_id, plugin.active_forms)
+                player.sent_forms[-1].on_close(player)
+
+        for response in (
+            json.dumps([False, 1]),
+            json.dumps([False, "0"]),
+            json.dumps([False, "129"]),
+        ):
+            with self.subTest(benchmark=response):
+                player = FakePlayerSender()
+                self.assertTrue(plugin._open_benchmark_form(player))
+                with patch.object(plugin, "_handle_benchmark") as handler:
+                    player.sent_forms[-1].on_submit(player, response)
+                handler.assert_not_called()
+                self.assertEqual(len(player.sent_forms), 2)
+
+    def test_uuid_lock_permission_recheck_and_send_failure_cleanup(self) -> None:
+        plugin, _sender = self.make_plugin()
+        shared_id = uuid4()
+        first = FakePlayerSender(shared_id)
+        same_player = FakePlayerSender(shared_id)
+        other = FakePlayerSender()
+
+        self.assertTrue(plugin._open_main_menu(first))
+        first_form = first.sent_forms[-1]
+        first_token = plugin.active_forms[shared_id]
+        self.assertFalse(plugin._open_main_menu(same_player))
+        self.assertEqual(same_player.sent_forms, [])
+        self.assertTrue(plugin._open_main_menu(other))
+
+        # A mismatched callback sender cannot release or act under another UUID.
+        first_form.on_submit(other, 0)
+        self.assertEqual(plugin.active_forms[shared_id], first_token)
+        self.assertIn(other.unique_id, plugin.active_forms)
+
+        first_form.on_close(first)
+        self.assertNotIn(shared_id, plugin.active_forms)
+        other.sent_forms[-1].on_close(other)
+
+        failing = FakePlayerSender()
+        failing.send_form_error = RuntimeError("send failed")
+        self.assertFalse(plugin._open_main_menu(failing))
+        self.assertNotIn(failing.unique_id, plugin.active_forms)
+        self.assertTrue(any("send failed" in message for message in failing.messages))
+
+        # A stale callback cannot clear a newer token or navigate.
+        self.assertTrue(plugin._open_main_menu(first))
+        stale_form = first.sent_forms[-1]
+        stale_form.on_close(first)
+        self.assertTrue(plugin._open_main_menu(first))
+        current_token = plugin.active_forms[shared_id]
+        sent_count = len(first.sent_forms)
+        stale_form.on_submit(first, 0)
+        self.assertEqual(plugin.active_forms[shared_id], current_token)
+        self.assertEqual(len(first.sent_forms), sent_count)
+        first.sent_forms[-1].on_close(first)
+
+        revoked = FakePlayerSender()
+        self.assertTrue(plugin._open_main_menu(revoked))
+        revoked.permission_granted = False
+        revoked.sent_forms[-1].on_submit(revoked, 0)
+        self.assertNotIn(revoked.unique_id, plugin.active_forms)
+        self.assertEqual(len(revoked.sent_forms), 1)
+        self.assertTrue(any("no longer active" in m for m in revoked.messages))
+
+        unavailable = FakePlayerSender()
+        self.assertTrue(plugin._open_main_menu(unavailable))
+        unavailable.is_dead = True
+        unavailable.sent_forms[-1].on_submit(unavailable, 0)
+        self.assertNotIn(unavailable.unique_id, plugin.active_forms)
+        self.assertEqual(len(unavailable.sent_forms), 1)
+
+    def test_form_locks_cleanup_on_quit_death_and_disable(self) -> None:
+        plugin, _sender = self.make_plugin()
+        quitting = FakePlayerSender()
+        dying = FakePlayerSender()
+        self.assertTrue(plugin._open_main_menu(quitting))
+        self.assertTrue(plugin._open_main_menu(dying))
+        stale_quit_form = quitting.sent_forms[-1]
+
+        plugin.on_player_quit(PlayerQuitEvent(quitting))
+        self.assertNotIn(quitting.unique_id, plugin.active_forms)
+        self.assertIn(dying.unique_id, plugin.active_forms)
+        plugin.on_player_death(PlayerDeathEvent(dying))
+        self.assertEqual(plugin.active_forms, {})
+
+        stale_quit_form.on_submit(quitting, 0)
+        self.assertEqual(len(quitting.sent_forms), 1)
+
+        self.assertTrue(plugin._open_main_menu(quitting))
+        stale_disable_form = quitting.sent_forms[-1]
+        plugin.on_disable()
+        self.assertEqual(plugin.active_forms, {})
+        self.assertIsNone(plugin.scheduler)
+        stale_disable_form.on_submit(quitting, 0)
+        self.assertEqual(len(quitting.sent_forms), 2)
 
     def test_endstone_logger_calls_pass_one_rendered_string(self) -> None:
         plugin_source = (
@@ -294,7 +822,7 @@ class StudioWheelTests(unittest.TestCase):
             return_value=bundled_bridge,
         ) as import_module:
             self.assertIs(
-                bridge_loader.import_live_bridge("0.4.5"), bundled_bridge
+                bridge_loader.import_live_bridge("0.4.6"), bundled_bridge
             )
         import_module.assert_called_once_with(
             "endstone_worldgen_studio._endstone_worldgen_live"
@@ -308,7 +836,7 @@ class StudioWheelTests(unittest.TestCase):
             side_effect=dependency_error,
         ) as import_module:
             with self.assertRaises(ModuleNotFoundError) as raised:
-                bridge_loader.import_live_bridge("0.4.5")
+                bridge_loader.import_live_bridge("0.4.6")
         self.assertIs(raised.exception, dependency_error)
         self.assertEqual(import_module.call_count, 1)
 
@@ -324,9 +852,9 @@ class StudioWheelTests(unittest.TestCase):
         ) as imported:
             with self.assertRaisesRegex(
                 ModuleNotFoundError,
-                "matching 0\\.4\\.5 CPython 3\\.14 platform wheel",
+                "matching 0\\.4\\.6 CPython 3\\.14 platform wheel",
             ):
-                bridge_loader.import_live_bridge("0.4.5")
+                bridge_loader.import_live_bridge("0.4.6")
         imported.assert_called_once_with(
             "endstone_worldgen_studio._endstone_worldgen_live"
         )

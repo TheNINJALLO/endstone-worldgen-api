@@ -1,10 +1,10 @@
 # Endstone WorldGen API
 
-[![Version](https://img.shields.io/badge/version-v0.4.5-blue.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.5)
+[![Version](https://img.shields.io/badge/version-v0.4.6-blue.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.6)
 [![Endstone](https://img.shields.io/badge/Endstone-v0.11.6-emerald.svg?style=for-the-badge)](https://github.com/EndstoneMC/endstone)
 [![BDS Version](https://img.shields.io/badge/BDS-1.26.33-purple.svg?style=for-the-badge)](https://www.minecraft.net/en-us/download/server/bedrock)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/actions)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-orange.svg?style=for-the-badge)](#-direct-release-downloads-v045)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-orange.svg?style=for-the-badge)](#-direct-release-downloads-v046)
 [![Language](https://img.shields.io/badge/language-C%2B%2B20%20%7C%20Python-3776AB.svg?style=for-the-badge)](#-c--python-api-quickstart)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg?style=for-the-badge)](LICENSE)
 
@@ -20,18 +20,18 @@ Comprehensive guides, architecture diagrams, stress testing tutorials, and full 
 
 ---
 
-## 📦 Direct Release Downloads (`v0.4.5`)
+## 📦 Direct Release Downloads (`v0.4.6`)
 
 Use the **complete ZIP** matching BDS 1.26.33 and the server platform. It contains both the native plugin and the matching self-contained `/wg` command wheel. The raw library is for native-API-only/manual installations.
 
 | Platform | BDS Version | Artifact Filename | Direct Download |
 | :--- | :--- | :--- | :--- |
-| **Windows x64 ZIP (recommended)** | `1.26.33` | `endstone-worldgen-api-v0.4.5-bds-1.26.33-windows-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5/endstone-worldgen-api-v0.4.5-bds-1.26.33-windows-x64.zip) |
-| **Linux x64 ZIP (recommended)** | `1.26.33` | `endstone-worldgen-api-v0.4.5-bds-1.26.33-linux-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5/endstone-worldgen-api-v0.4.5-bds-1.26.33-linux-x64.zip) |
-| **Windows x64 raw plugin** | `1.26.33` | `endstone-worldgen-api-v0.4.5-bds-1.26.33-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5/endstone-worldgen-api-v0.4.5-bds-1.26.33-windows-x64.dll) |
-| **Linux x64 raw plugin** | `1.26.33` | `endstone-worldgen-api-v0.4.5-bds-1.26.33-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5/endstone-worldgen-api-v0.4.5-bds-1.26.33-linux-x64.so) |
-| **Windows `/wg` wheel** | `CPython 3.14` | `endstone_worldgen_studio-0.4.5-cp314-cp314-win_amd64.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5/endstone_worldgen_studio-0.4.5-cp314-cp314-win_amd64.whl) |
-| **Linux `/wg` wheel** | `CPython 3.14` | `endstone_worldgen_studio-0.4.5-cp314-cp314-linux_x86_64.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.5/endstone_worldgen_studio-0.4.5-cp314-cp314-linux_x86_64.whl) |
+| **Windows x64 ZIP (recommended)** | `1.26.33` | `endstone-worldgen-api-v0.4.6-bds-1.26.33-windows-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.6/endstone-worldgen-api-v0.4.6-bds-1.26.33-windows-x64.zip) |
+| **Linux x64 ZIP (recommended)** | `1.26.33` | `endstone-worldgen-api-v0.4.6-bds-1.26.33-linux-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.6/endstone-worldgen-api-v0.4.6-bds-1.26.33-linux-x64.zip) |
+| **Windows x64 raw plugin** | `1.26.33` | `endstone-worldgen-api-v0.4.6-bds-1.26.33-windows-x64.dll` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.6/endstone-worldgen-api-v0.4.6-bds-1.26.33-windows-x64.dll) |
+| **Linux x64 raw plugin** | `1.26.33` | `endstone-worldgen-api-v0.4.6-bds-1.26.33-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.6/endstone-worldgen-api-v0.4.6-bds-1.26.33-linux-x64.so) |
+| **Windows `/wg` wheel** | `CPython 3.14` | `endstone_worldgen_studio-0.4.6-cp314-cp314-win_amd64.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.6/endstone_worldgen_studio-0.4.6-cp314-cp314-win_amd64.whl) |
+| **Linux `/wg` wheel** | `CPython 3.14` | `endstone_worldgen_studio-0.4.6-cp314-cp314-linux_x86_64.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.6/endstone_worldgen_studio-0.4.6-cp314-cp314-linux_x86_64.whl) |
 
 ---
 
@@ -109,23 +109,30 @@ void registerPopulator(
 
 The repository includes the [`endstone_worldgen_studio`](examples/python/world_gen_studio_plugin/) command plugin. Choose the platform-specific **CPython 3.14** wheel from the same exact build as the native plugin; its `_endstone_worldgen_live` bridge is bundled inside the wheel.
 
-Stop the server and remove older WorldGen Studio wheels before copying v0.4.5; leaving multiple versions in `plugins/` can make Endstone install them in an undefined order.
+Stop the server and remove older WorldGen Studio wheels before copying v0.4.6; leaving multiple versions in `plugins/` can make Endstone install them in an undefined order.
 
 ```bash
 # Linux example: copy both files from the complete ZIP's plugins/ directory.
 cp endstone_worldgen_bds_1_26_33.so /path/to/endstone/plugins/
-cp endstone_worldgen_studio-0.4.5-cp314-cp314-linux_x86_64.whl /path/to/endstone/plugins/
+cp endstone_worldgen_studio-0.4.6-cp314-cp314-linux_x86_64.whl /path/to/endstone/plugins/
 ```
 
 ### In-Game Command Reference
 | Command | Usage | Description |
 | :--- | :--- | :--- |
+| `/wg` or `/wg menu` | `/wg menu` | Opens the guarded in-game menu with navigation for every command below. |
 | `/wg status` | `/wg status` | Displays manual live-recipe, interceptor, failure, queue, and exact-adapter counters. |
 | `/wg gen <flat\|island\|maze\|ores>` | `/wg gen island 0 0` | Applies a player-height-anchored live recipe and reports the actual changed Y range after native commit and flush. |
 | `/wg structure <castle\|arena>` | `/wg structure castle 0 0` | Applies a player-height-anchored live recipe across a 3x3 chunk area. |
 | `/wg buffer <flat\|island\|maze\|ores>` | `/wg buffer island 0 0` | Runs a detached Python reference-buffer generator. |
 | `/wg benchmark [chunk_count]` | `/wg benchmark 100` | Benchmarks up to 128 detached Python reference buffers. |
 | `/wg inspect [cx] [cz]` | `/wg inspect 0 0` | Displays a detached reference buffer. |
+
+The menu permits one WorldGen form per player, validates every selection and
+field, and confirms live generation or structure writes before dispatch. Form
+close navigates back, while disconnect, death, plugin shutdown, or send failure
+clears its lock. Typed commands remain supported, and the console receives text
+help because Bedrock forms are player-only.
 
 Live recipes resolve stable namespaced `BlockData` descriptors from the exact
 server, preserve cells outside their bounded patch, and never edit biomes. Use a
