@@ -1,3 +1,8 @@
+## 0.4.5
+
+- Promoted the beta.32 feature set to the stable 0.4.5 release without changing the BDS 1.26.33, Endstone 0.11.6, API 0.4.5, or service ABI v2 contracts.
+- Published stable native packages and CPython 3.14 command wheels under `v0.4.5` as a non-prerelease GitHub Release marked Latest.
+
 ## 0.4.5-beta.32
 
 - Replaced the misleading detached `/wg gen` and `/wg structure` paths with exact primary-thread live recipes that resolve server BlockData, capture before writing, preserve untouched cells and biomes, and require commit plus flush confirmation before success.

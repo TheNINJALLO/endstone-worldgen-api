@@ -76,7 +76,7 @@ class WorldGenStudioPlugin(Plugin):
     """Exercise live native recipes and detached scheduler buffers from commands."""
 
     api_version = "0.11"
-    version = "0.4.5-beta.32"
+    version = "0.4.5"
     description = "Interactive live WorldGen and detached-buffer test suite"
     depend = ["worldgen_api"]
 
@@ -199,7 +199,7 @@ class WorldGenStudioPlugin(Plugin):
         return getattr(self, handler_name)(sender, args[1:])
 
     def _send_help(self, sender: CommandSender) -> None:
-        sender.send_message("§e=== WorldGen Studio Test Plugin (v0.4.5-beta.32) ===")
+        sender.send_message("§e=== WorldGen Studio Test Plugin (v0.4.5) ===")
         sender.send_message(
             "§a/wg gen <flat|island|maze|ores> [cx cz] §7- Commit one bounded live recipe"
         )
@@ -227,7 +227,7 @@ class WorldGenStudioPlugin(Plugin):
             reason = getattr(self, "bridge_error", "native bridge is unavailable")
             sender.send_message(f"§cNative WorldGen service unavailable: {reason}")
             sender.send_message(
-                "§7Install the matching beta.32 platform wheel from the exact BDS bundle."
+                "§7Install the matching v0.4.5 platform wheel from the exact BDS bundle."
             )
             return None
         return bridge
