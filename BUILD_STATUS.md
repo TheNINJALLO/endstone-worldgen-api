@@ -1,6 +1,6 @@
 # Build status
 
-Version: **0.4.6**
+Version: **0.4.7**
 
 ## Implemented
 
@@ -19,6 +19,9 @@ Version: **0.4.6**
 - ABI-versioned `endstone:worldgen:v2` service with primary-thread live recipes
 - Commit-and-flush-confirmed `/wg gen` and `/wg structure` command paths anchored
   at the block below the sender, with exact native changed-Y reporting
+- Exact loaded-state and block-actor preflight plus native runtime-ID readback verification
+- Conflict-safe automatic-populator block/biome delta merge with bounded recapture retries
+- Explicit live-write/detached menu labels with a visible maze default
 
 ## Validation boundary
 

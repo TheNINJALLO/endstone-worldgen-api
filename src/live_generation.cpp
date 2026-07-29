@@ -361,7 +361,8 @@ LiveGenerationResult generateLive(IVanillaGenerationAdapter &adapter,
                 result.failure = LiveGenerationFailure::Capture;
                 result.message = "capture failed for chunk (" +
                                  std::to_string(target.position.x) + ", " +
-                                 std::to_string(target.position.z) + ")";
+                                 std::to_string(target.position.z) +
+                                 "); the target chunk must already be loaded";
                 return result;
             }
             if (!captured->hasCompletePalette()) {

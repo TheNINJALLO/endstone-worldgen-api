@@ -1,8 +1,90 @@
 #include "endstone_worldgen/generation_interceptor.h"
 #include <algorithm>
+#include <optional>
 #include <sstream>
 
 namespace endstone_worldgen {
+namespace {
+bool sameGeometry(const ChunkBuffer &left, const ChunkBuffer &right) noexcept {
+    return left.position() == right.position() && left.minY() == right.minY() &&
+           left.maxY() == right.maxY();
+}
+
+bool hasChanges(const ChunkBuffer &baseline, const ChunkBuffer &desired) {
+    if (!sameGeometry(baseline, desired) ||
+        baseline.biomeCells() != desired.biomeCells()) return true;
+    for (std::int64_t y = baseline.minY(); y <= baseline.maxY(); ++y) {
+        for (int z = 0; z < 16; ++z) {
+            for (int x = 0; x < 16; ++x) {
+                if (baseline.getRuntimeId(x, static_cast<int>(y), z) !=
+                    desired.getRuntimeId(x, static_cast<int>(y), z)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+std::optional<ChunkBuffer> mergeDelta(const ChunkBuffer &baseline,
+                                      const ChunkBuffer &desired,
+                                      ChunkBuffer current,
+                                      bool allow_biome_edits) {
+    if (!sameGeometry(baseline, desired) || !sameGeometry(baseline, current)) {
+        return std::nullopt;
+    }
+
+    for (std::int64_t y = baseline.minY(); y <= baseline.maxY(); ++y) {
+        const auto block_y = static_cast<int>(y);
+        for (int z = 0; z < 16; ++z) {
+            for (int x = 0; x < 16; ++x) {
+                const auto original_id = baseline.getRuntimeId(x, block_y, z);
+                const auto desired_id = desired.getRuntimeId(x, block_y, z);
+                if (original_id == desired_id) continue;
+
+                // A live edit landed after the worker snapshot. Abort the
+                // entire result before commit instead of overwriting it.
+                if (current.getRuntimeId(x, block_y, z) != original_id) {
+                    return std::nullopt;
+                }
+                const auto *descriptor = desired.paletteEntry(desired_id);
+                if (!descriptor) return std::nullopt;
+                current.setPaletteEntry(desired_id, *descriptor);
+                current.setRuntimeId(x, block_y, z, desired_id);
+            }
+        }
+    }
+
+    if (baseline.biomeCells() != desired.biomeCells()) {
+        if (!allow_biome_edits) return std::nullopt;
+        const auto &original_biomes = baseline.biomeCells();
+        const auto &desired_biomes = desired.biomeCells();
+        const auto current_biomes = current.biomeCells();
+
+        for (const auto &[key, original_biome] : original_biomes) {
+            const auto desired_entry = desired_biomes.find(key);
+            if (desired_entry != desired_biomes.end() &&
+                desired_entry->second == original_biome) {
+                continue;
+            }
+            const auto current_entry = current_biomes.find(key);
+            if (current_entry == current_biomes.end() ||
+                current_entry->second != original_biome) {
+                return std::nullopt;
+            }
+            if (desired_entry == desired_biomes.end()) current.eraseBiomeCell(key);
+            else current.setBiomeCell(key, desired_entry->second);
+        }
+        for (const auto &[key, desired_biome] : desired_biomes) {
+            if (original_biomes.contains(key)) continue;
+            if (current_biomes.contains(key)) return std::nullopt;
+            current.setBiomeCell(key, desired_biome);
+        }
+    }
+    return current;
+}
+} // namespace
+
 GenerationInterceptor::GenerationInterceptor(IVanillaGenerationAdapter &adapter, GenerationScheduler &scheduler,
     std::uint64_t world_seed, InterceptorConfig config)
     : adapter_(adapter), scheduler_(scheduler), world_seed_(world_seed), config_(config) {}
@@ -69,23 +151,69 @@ void GenerationInterceptor::dispatchWaiting(){
             continue;
         }
         GenerationContext context{world_seed_,entry.request.dimension,entry.request.position,GenerationStage::Decoration,0};
+        auto baseline=*captured;
         auto future=scheduler_.populatePipeline(std::move(context),std::move(*captured),populators_,config_.priority);
-        pending_.push_back({std::move(entry.request),std::move(future)});++stats_.dispatched;
+        pending_.push_back({std::move(entry.request),std::move(baseline),std::move(future),std::nullopt,0});++stats_.dispatched;
     }
     stats_.waiting=waiting_.size();stats_.inflight=pending_.size();
 }
 void GenerationInterceptor::commitReady(){
-    std::size_t committed_now=0;
-    for(auto it=pending_.begin();it!=pending_.end()&&committed_now<config_.max_commits_per_pump;){
-        if(it->future.wait_for(std::chrono::seconds(0))!=std::future_status::ready){++it;continue;}
+    std::size_t commit_work_now=0;
+    std::size_t examined_now=0;
+    const auto candidates=pending_.size();
+    for(auto it=pending_.begin();it!=pending_.end()&&
+        examined_now<candidates&&commit_work_now<config_.max_commits_per_pump;){
+        ++examined_now;
+        if(!it->completed){
+            if(it->future.wait_for(std::chrono::seconds(0))!=std::future_status::ready){++it;continue;}
+            try{
+                it->completed=it->future.get();
+            }catch(...){
+                ++stats_.commit_failures;
+                active_keys_.erase(keyOf(it->request));
+                it=pending_.erase(it);++commit_work_now;
+                continue;
+            }
+        }
+
+        ++commit_work_now;
+        const bool commit_required=hasChanges(it->baseline,it->completed->chunk);
+        if(!commit_required){
+            active_keys_.erase(keyOf(it->request));
+            it=pending_.erase(it);
+            continue;
+        }
+
+        auto current=adapter_.captureChunk(it->request.dimension,it->request.position);
+        if(!current){
+            ++it->recapture_attempts;
+            ++stats_.capture_retries;
+            if(it->recapture_attempts<config_.capture_retry_ticks){
+                // Give later ready jobs a turn on the next pump instead of
+                // letting one temporarily unavailable chunk monopolize the
+                // bounded commit gate for its entire retry window.
+                if(it+1!=pending_.end())std::rotate(it,it+1,pending_.end());
+                else ++it;
+                continue;
+            }
+            ++stats_.capture_failures;
+            ++stats_.commit_failures;
+            active_keys_.erase(keyOf(it->request));
+            it=pending_.erase(it);
+            continue;
+        }
+
         bool ok=false;
         try{
-            auto result=it->future.get();
-            ok=adapter_.commitChunk(it->request.dimension,result.chunk);
-            if(ok) ok=adapter_.flushThreadBatch(it->request.dimension);
+            if(auto merged=mergeDelta(
+                   it->baseline,it->completed->chunk,std::move(*current),
+                   adapter_.capabilities().biome_edits)){
+                ok=adapter_.commitChunk(it->request.dimension,*merged);
+                if(ok) ok=adapter_.flushThreadBatch(it->request.dimension);
+            }
         }catch(...){ok=false;}
         if(ok)++stats_.committed;else ++stats_.commit_failures;
-        active_keys_.erase(keyOf(it->request));it=pending_.erase(it);++committed_now;
+        active_keys_.erase(keyOf(it->request));it=pending_.erase(it);
     }
     stats_.inflight=pending_.size();
 }

@@ -8,6 +8,15 @@ The scheduler runs only detached data on workers.
 4. Cross-chunk populators acquire ordered neighborhood locks.
 5. A result is queued for a main-thread commit, also limited to one per tick by default. The adapter rejects detached biome edits and preflights every used block palette descriptor before its first live block mutation.
 
+Automatic worker results never full-commit their original snapshot. Unchanged
+results skip the commit and flush path. Changed results recapture the live chunk
+on the primary thread with bounded retries, require every changed block runtime
+ID and supported biome cell to still match its captured value, merge only those
+changes into the fresh snapshot, and abort before writing if any target
+conflicts. Unrelated edits made while a worker was running are therefore
+preserved. The exact adapter rejects changed cells containing block actors
+because `ChunkBuffer` does not carry their NBT.
+
 Live `LevelChunk`, `Dimension`, `BlockSource`, players, actors and Endstone API objects must never enter a worker.
 Capture and commit therefore still consume primary-thread time; increasing either budget trades tick latency for throughput.
 The interceptor waiting queue defaults to 256 entries. Requests beyond that cap
@@ -25,3 +34,6 @@ registered `IPopulator`. Visible recipes carry the command sender's
 vertical band fits every captured chunk. Ore generation deliberately ignores
 that visible anchor and scans only natural stone/deepslate. Results carry a
 nullable union of the actual confirmed or flush-unconfirmed changed Y range.
+The exact adapter requires `ChunkState::Loaded`, rejects changed block-actor
+cells, and reads every changed runtime ID back through the native block source
+before the recipe can report a successful commit.

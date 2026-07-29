@@ -11,8 +11,8 @@ system and BDS build, then copy the matching platform wheel into the server's
 or manual `site-packages` copy is required. Endstone must run **CPython 3.14**.
 
 ```text
-endstone_worldgen_studio-0.4.6-cp314-cp314-linux_x86_64.whl
-endstone_worldgen_studio-0.4.6-cp314-cp314-win_amd64.whl
+endstone_worldgen_studio-0.4.7-cp314-cp314-linux_x86_64.whl
+endstone_worldgen_studio-0.4.7-cp314-cp314-win_amd64.whl
 ```
 
 Endstone discovers the `worldgen-studio` entry point at startup. All commands
@@ -30,15 +30,22 @@ require operator status or the `wg.admin` permission.
 - `/wg inspect [cx cz]`: inspect a detached reference buffer.
 
 Only one WorldGen form can be active per player. Child pages navigate back on
-close, and live generation or structure writes require a separate confirmation.
+close, and live generation or structure writes started from the menu require a
+separate confirmation. Typed `/wg gen` and `/wg structure` commands execute
+immediately after validation, so use them deliberately.
 Strict response validation, UUID-scoped stale-callback suppression, permission
 rechecks, and quit/death/shutdown cleanup prevent duplicate forms or repeated
 world writes.
 
-`gen` and `structure` capture every target chunk on the primary thread, resolve
+Menu buttons explicitly label live world writes and detached actions. Live
+generation defaults to `maze`, which rises visibly above the selected floor;
+`flat` can resemble an existing grass surface and `ores` is underground.
+
+`gen` and `structure` require every target chunk to be fully loaded, capture it on the primary thread, resolve
 the recipe's namespaced `BlockData` descriptors against the exact server, alter
-only the recipe's selected block cells, and leave biomes untouched. Success is
-reported only after every changed chunk passes native commit and flush. Use a
+only the recipe's selected block cells, refuse block-actor targets, and leave biomes untouched. Success is
+reported only after every changed chunk passes native runtime-ID readback,
+commit, and flush. Use a
 world backup and disposable coordinates: these two commands intentionally edit
 the live world.
 

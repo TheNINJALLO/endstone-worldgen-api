@@ -9,6 +9,24 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class TestNativeSourceGuards(unittest.TestCase):
+    def test_empty_consumer_pipeline_is_informational_not_a_startup_warning(self):
+        plugin = (ROOT / "src/plugin.cpp").read_text(encoding="utf-8")
+        self.assertNotIn("No native IPopulator is registered by default", plugin)
+        self.assertNotRegex(
+            plugin,
+            r"getLogger\(\)\.warning\([^;]*IPopulator",
+        )
+        self.assertIn("Automatic ChunkSource interception is ready", plugin)
+        self.assertIn("/wg gen and /wg structure", plugin)
+
+    def test_exact_adapter_requires_loaded_chunks_and_verifies_native_writes(self):
+        adapter = (ROOT / "src/bds_26_30_adapter.cpp").read_text(encoding="utf-8")
+        self.assertGreaterEqual(adapter.count("isLoadedChunk(source, native_chunk)"), 2)
+        self.assertIn("== ChunkState::Loaded", adapter)
+        self.assertIn("source.getBlock(write.position).getRuntimeId()", adapter)
+        self.assertIn("source.getBlockEntity(position) != nullptr", adapter)
+        self.assertNotIn("EndstoneBlockData", adapter)
+
     def test_linux_plugin_preserves_host_imports_and_gates_private_bedrock_symbols(self):
         cmake = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
         link_options = re.findall(

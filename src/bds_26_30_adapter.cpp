@@ -1,5 +1,6 @@
 #include "endstone_worldgen/bds_26_30_adapter.h"
 #include <endstone/endstone.hpp>
+#include "bedrock/world/level/block_source.h"
 #include "bedrock/world/level/dimension/dimension.h"
 #include "bedrock/world/level/chunk/chunk_source.h"
 #include "endstone/core/level/dimension.h"
@@ -36,6 +37,17 @@ bool chunkOrigin(std::int32_t chunk, int &origin) noexcept {
     }
     origin = static_cast<int>(value);
     return true;
+}
+
+bool isLoadedChunk(BlockSource &source, const ::ChunkPos &position) noexcept {
+    try {
+        if (!source.hasChunk(position, false)) return false;
+        const auto *chunk = source.getChunk(position);
+        return chunk != nullptr &&
+               chunk->getState().load(std::memory_order_acquire) == ChunkState::Loaded;
+    } catch (...) {
+        return false;
+    }
 }
 
 struct HookQueue {
@@ -268,19 +280,22 @@ public:
         auto &source = exact->getHandle().getBlockSourceFromMainChunkSource();
         diagnostics_.chunk_source_available = true;
         diagnostics_.chunk_source_can_launch_tasks = source.getChunkSource().canLaunchTasks();
+        const ::ChunkPos native_chunk(pos.x, pos.z);
+        if (!isLoadedChunk(source, native_chunk)) return std::nullopt;
 
         for (int y = min_y; y <= max_y; ++y) {
             for (int z = 0; z < 16; ++z) {
                 for (int x = 0; x < 16; ++x) {
                     const int world_x = origin_x + x;
                     const int world_z = origin_z + z;
-                    auto block = dimension->getBlockAt(world_x, y, world_z);
-                    if (!block) return std::nullopt;
-                    auto data = block->getData();
-                    if (!data) return std::nullopt;
-                    const auto id = data->getRuntimeId();
+                    const auto &native_block = source.getBlock(::BlockPos(world_x, y, world_z));
+                    const auto id = native_block.getRuntimeId();
                     buffer.setRuntimeId(x, y, z, id);
                     if (!buffer.paletteEntry(id)) {
+                        auto block = dimension->getBlockAt(world_x, y, world_z);
+                        if (!block) return std::nullopt;
+                        auto data = block->getData();
+                        if (!data || data->getRuntimeId() != id) return std::nullopt;
                         BlockDescriptor descriptor;
                         descriptor.type = data->getType();
                         for (const auto &[key, value] : data->getBlockStates()) {
@@ -306,7 +321,11 @@ public:
             !chunkOrigin(buffer.position().z, origin_z)) return false;
         auto *level = server_.getLevel();
         auto *dimension = level ? level->getDimension(dimension_name) : nullptr;
-        if (!dimension) return false;
+        auto *exact = static_cast<endstone::core::EndstoneDimension *>(dimension);
+        if (!dimension || !exact) return false;
+        auto &source = exact->getHandle().getBlockSourceFromMainChunkSource();
+        const ::ChunkPos native_chunk(buffer.position().x, buffer.position().z);
+        if (!isLoadedChunk(source, native_chunk)) return false;
 
         // Resolve the complete detached palette before the first live block is
         // changed. A missing descriptor, an invalid state set, or a descriptor
@@ -318,6 +337,7 @@ public:
         struct PendingWrite {
             BlockHandle block;
             BlockDataHandle original;
+            ::BlockPos position;
             std::uint32_t runtime_id{};
         };
         std::vector<PendingWrite> writes;
@@ -345,39 +365,59 @@ public:
             for (int z = 0; z < 16; ++z) {
                 for (int x = 0; x < 16; ++x) {
                     const auto id = buffer.getRuntimeId(x, y, z);
-                    auto block = dimension->getBlockAt(origin_x + x, y, origin_z + z);
-                    if (!block) return false;
-                    auto current = block->getData();
-                    if (!current) return false;
-                    if (current && current->getRuntimeId() == id) continue;
+                    const ::BlockPos position(origin_x + x, y, origin_z + z);
+                    const auto &current = source.getBlock(position);
+                    if (current.getRuntimeId() == id) continue;
                     const auto it = native_palette.find(id);
                     if (it == native_palette.end()) return false;
-                    writes.push_back({std::move(block), std::move(current), id});
+                    // ChunkBuffer intentionally contains no block-actor NBT.
+                    // Replacing such a cell could destroy inventories or other
+                    // actor state even when the runtime ID still matches.
+                    if (source.getBlockEntity(position) != nullptr) return false;
+                    auto block = dimension->getBlockAt(position.x, position.y, position.z);
+                    if (!block) return false;
+                    auto original = block->getData();
+                    if (!original || original->getRuntimeId() != current.getRuntimeId()) {
+                        return false;
+                    }
+                    writes.push_back(
+                        {std::move(block), std::move(original), position, id});
                 }
             }
         }
 
         std::size_t applied{};
-        try {
-            for (auto &write : writes) {
-                const auto replacement = native_palette.find(write.runtime_id);
-                if (replacement == native_palette.end()) return false;
-                write.block->setData(*replacement->second, false);
-                ++applied;
-            }
-        } catch (...) {
-            // Every target and descriptor was preflighted before the first
-            // setter. If a setter itself throws, make a best-effort rollback of
-            // the writes already applied instead of knowingly leaving a prefix.
+        const auto rollback = [&]() noexcept {
             while (applied > 0) {
                 --applied;
                 try {
                     writes[applied].block->setData(*writes[applied].original, false);
                 } catch (...) {
-                    // The caller receives failure and must treat persistence as
-                    // unconfirmed; there is no stronger public transaction API.
+                    // Failure is reported to the caller; no stronger native
+                    // transaction primitive is available in this exact ABI.
                 }
             }
+        };
+        try {
+            for (auto &write : writes) {
+                const auto replacement = native_palette.find(write.runtime_id);
+                if (replacement == native_palette.end()) {
+                    rollback();
+                    return false;
+                }
+                write.block->setData(*replacement->second, false);
+                ++applied;
+            }
+            for (const auto &write : writes) {
+                if (source.getBlock(write.position).getRuntimeId() != write.runtime_id) {
+                    rollback();
+                    return false;
+                }
+            }
+        } catch (...) {
+            // Every target and descriptor was preflighted before the first
+            // setter. Roll back a rejected, throwing, or unverifiable prefix.
+            rollback();
             return false;
         }
         return true;

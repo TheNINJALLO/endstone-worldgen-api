@@ -78,7 +78,7 @@ class WorldGenStudioPlugin(Plugin):
     """Exercise live native recipes and detached scheduler buffers from commands."""
 
     api_version = "0.11"
-    version = "0.4.6"
+    version = "0.4.7"
     description = "Interactive live WorldGen and detached-buffer test suite"
     depend = ["worldgen_api"]
 
@@ -173,7 +173,10 @@ class WorldGenStudioPlugin(Plugin):
                 f"{self.bridge_error}"
             )
         else:
-            self.logger.info("WorldGen Studio enabled against the native endstone:worldgen:v2 service.")
+            self.logger.info(
+                "WorldGen Studio enabled against the native endstone:worldgen:v2 service; "
+                "live /wg gen and /wg structure writes are available, while detached commands do not edit the world."
+            )
 
     def _connect_bridge(self) -> Any | None:
         """Connect to the native service, allowing command-time recovery."""
@@ -442,16 +445,17 @@ class WorldGenStudioPlugin(Plugin):
         form = ActionForm(
             title="§l§bWorldGen Studio",
             content=(
-                "Choose a command group. Live generation and structures require a separate "
-                "world-write confirmation."
+                "Choose a command group. Live generation and structures write to the current "
+                "world after confirmation. Detached, benchmark, and inspect actions never edit "
+                "the live world."
             ),
         )
         for label in (
-            "§cLive Generation",
-            "§6Live Structures",
-            "§aDetached Buffers",
-            "§bBenchmark",
-            "§dInspect Buffer",
+            "§cLive Generation §7(World Write)",
+            "§6Live Structures §7(World Write)",
+            "§aDetached Buffers §7(No World Changes)",
+            "§bBenchmark §7(No World Changes)",
+            "§dInspect Buffer §7(No World Changes)",
             "§eNative Status",
         ):
             form.add_button(label)
@@ -490,7 +494,13 @@ class WorldGenStudioPlugin(Plugin):
         if command_name not in {"gen", "structure", "buffer"}:
             raise ValueError(f"unsupported menu recipe command: {command_name}")
 
-        defaults = list(defaults or [recipes[0]])
+        if defaults is None:
+            # A maze visibly rises above the player's floor. Flat can look
+            # unchanged on ordinary grass and ores are intentionally hidden
+            # underground, so neither is a useful live-menu default.
+            defaults = ["maze" if command_name == "gen" else recipes[0]]
+        else:
+            defaults = list(defaults or [recipes[0]])
         default_recipe = defaults[0] if defaults and defaults[0] in recipes else recipes[0]
         use_current_chunk = len(defaults) == 1
         chunk_x = defaults[1] if len(defaults) == 3 else ""
@@ -505,12 +515,22 @@ class WorldGenStudioPlugin(Plugin):
             "structure": "Review Live Write",
             "buffer": "Generate Detached Buffer",
         }
+        recipe_labels = {
+            "gen": (
+                "Flat Surface Patch",
+                "Island at Floor Level",
+                "Maze (Clearly Visible)",
+                "Ores (Underground)",
+            ),
+            "structure": ("Castle (3x3 Chunks)", "Arena (3x3 Chunks)"),
+            "buffer": tuple(f"{recipe.title()} (Detached Only)" for recipe in recipes),
+        }
         form = ModalForm(
             title=f"§l{titles[command_name]}",
             controls=[
                 Dropdown(
                     label="Recipe",
-                    options=[recipe.title() for recipe in recipes],
+                    options=list(recipe_labels[command_name]),
                     default_index=recipes.index(default_recipe),
                 ),
                 Toggle(label="Use my current chunk", default_value=use_current_chunk),
@@ -1017,8 +1037,8 @@ class WorldGenStudioPlugin(Plugin):
             )
         if int(status.get("populator_count", 0)) == 0:
             sender.send_message(
-                "§cAutomatic intercepted generation is not ready: 0 native populators; "
-                "intercepted requests are counted as empty-pipeline work."
+                "§eAutomatic interception is idle: no consumer IPopulator is registered. "
+                "This is normal for the standalone API and does not affect /wg gen or /wg structure."
             )
         sender.send_message(
             f"§7Intercepted: §f{status.get('intercepted_requests', 0)} "

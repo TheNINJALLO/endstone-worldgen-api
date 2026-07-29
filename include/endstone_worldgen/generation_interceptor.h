@@ -5,6 +5,7 @@
 #include <future>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -59,7 +60,10 @@ private:
     struct WaitingRequest { NativeChunkRequest request; std::size_t attempts{}; };
     struct PendingJob {
         NativeChunkRequest request;
+        ChunkBuffer baseline;
         std::future<GenerationResult> future;
+        std::optional<GenerationResult> completed;
+        std::size_t recapture_attempts{};
     };
     [[nodiscard]] std::string keyOf(const NativeChunkRequest &request) const;
     void ingestRequests();
