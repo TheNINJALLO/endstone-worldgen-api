@@ -19,12 +19,15 @@ class TestNativeSourceGuards(unittest.TestCase):
         self.assertIn("Automatic ChunkSource interception is ready", plugin)
         self.assertIn("/wg gen and /wg structure", plugin)
 
-    def test_exact_adapter_requires_loaded_chunks_and_verifies_native_writes(self):
+    def test_exact_adapter_requires_loaded_chunks_and_verifies_public_writes(self):
         adapter = (ROOT / "src/bds_26_30_adapter.cpp").read_text(encoding="utf-8")
         self.assertGreaterEqual(adapter.count("isLoadedChunk(source, native_chunk)"), 2)
         self.assertIn("== ChunkState::Loaded", adapter)
-        self.assertIn("source.getBlock(write.position).getRuntimeId()", adapter)
+        self.assertIn("auto current = write.block->getData()", adapter)
+        self.assertIn("current->getRuntimeId() != write.runtime_id", adapter)
         self.assertIn("source.getBlockEntity(position) != nullptr", adapter)
+        self.assertNotIn("source.getBlock(", adapter)
+        self.assertNotIn("native_block.getRuntimeId()", adapter)
         self.assertNotIn("EndstoneBlockData", adapter)
 
     def test_linux_plugin_preserves_host_imports_and_gates_private_bedrock_symbols(self):

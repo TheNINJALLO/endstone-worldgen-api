@@ -35,5 +35,5 @@ vertical band fits every captured chunk. Ore generation deliberately ignores
 that visible anchor and scans only natural stone/deepslate. Results carry a
 nullable union of the actual confirmed or flush-unconfirmed changed Y range.
 The exact adapter requires `ChunkState::Loaded`, rejects changed block-actor
-cells, and reads every changed runtime ID back through the native block source
-before the recipe can report a successful commit.
+cells, and reads every changed runtime ID back through Endstone's public virtual
+BlockData boundary before the recipe can report a successful commit.

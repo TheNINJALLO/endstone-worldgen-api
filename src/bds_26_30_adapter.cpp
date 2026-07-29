@@ -288,14 +288,17 @@ public:
                 for (int x = 0; x < 16; ++x) {
                     const int world_x = origin_x + x;
                     const int world_z = origin_z + z;
-                    const auto &native_block = source.getBlock(::BlockPos(world_x, y, world_z));
-                    const auto id = native_block.getRuntimeId();
+                    // Stay on Endstone's public virtual boundary here. Calling
+                    // Block::getRuntimeId directly pulls concrete Bedrock
+                    // archive objects into the Windows plugin, which in turn
+                    // require host-only ItemRegistryManager symbols.
+                    auto block = dimension->getBlockAt(world_x, y, world_z);
+                    if (!block) return std::nullopt;
+                    auto data = block->getData();
+                    if (!data) return std::nullopt;
+                    const auto id = data->getRuntimeId();
                     buffer.setRuntimeId(x, y, z, id);
                     if (!buffer.paletteEntry(id)) {
-                        auto block = dimension->getBlockAt(world_x, y, world_z);
-                        if (!block) return std::nullopt;
-                        auto data = block->getData();
-                        if (!data || data->getRuntimeId() != id) return std::nullopt;
                         BlockDescriptor descriptor;
                         descriptor.type = data->getType();
                         for (const auto &[key, value] : data->getBlockStates()) {
@@ -337,7 +340,6 @@ public:
         struct PendingWrite {
             BlockHandle block;
             BlockDataHandle original;
-            ::BlockPos position;
             std::uint32_t runtime_id{};
         };
         std::vector<PendingWrite> writes;
@@ -366,22 +368,19 @@ public:
                 for (int x = 0; x < 16; ++x) {
                     const auto id = buffer.getRuntimeId(x, y, z);
                     const ::BlockPos position(origin_x + x, y, origin_z + z);
-                    const auto &current = source.getBlock(position);
-                    if (current.getRuntimeId() == id) continue;
+                    auto block = dimension->getBlockAt(position.x, position.y, position.z);
+                    if (!block) return false;
+                    auto original = block->getData();
+                    if (!original) return false;
+                    if (original->getRuntimeId() == id) continue;
                     const auto it = native_palette.find(id);
                     if (it == native_palette.end()) return false;
                     // ChunkBuffer intentionally contains no block-actor NBT.
                     // Replacing such a cell could destroy inventories or other
                     // actor state even when the runtime ID still matches.
                     if (source.getBlockEntity(position) != nullptr) return false;
-                    auto block = dimension->getBlockAt(position.x, position.y, position.z);
-                    if (!block) return false;
-                    auto original = block->getData();
-                    if (!original || original->getRuntimeId() != current.getRuntimeId()) {
-                        return false;
-                    }
                     writes.push_back(
-                        {std::move(block), std::move(original), position, id});
+                        {std::move(block), std::move(original), id});
                 }
             }
         }
@@ -409,7 +408,8 @@ public:
                 ++applied;
             }
             for (const auto &write : writes) {
-                if (source.getBlock(write.position).getRuntimeId() != write.runtime_id) {
+                auto current = write.block->getData();
+                if (!current || current->getRuntimeId() != write.runtime_id) {
                     rollback();
                     return false;
                 }

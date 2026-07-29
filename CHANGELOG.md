@@ -2,7 +2,7 @@
 
 - Reclassified the expected startup-time zero-populator state as informational: dependent native consumers register only after the WorldGen service is enabled, and `/wg gen` plus `/wg structure` use a separate live-recipe path.
 - Added conflict-safe automatic population commits. Worker results now skip unchanged chunks, retry bounded safety recaptures, merge block and supported-biome deltas into a fresh snapshot, propagate new palette descriptors, preserve unrelated live edits, and reject conflicts before commit.
-- Required live recipe targets to reach exact `ChunkState::Loaded`, switched exact chunk scans and verification to the native block source, retained Endstone's public virtual write boundary, rejected block-actor target cells, and read back every changed runtime ID before reporting success.
+- Required live recipe targets to reach exact `ChunkState::Loaded`, retained Endstone's public virtual BlockData boundary for runtime-ID scans and verification, rejected block-actor target cells, and read back every changed runtime ID before reporting success without linking concrete host-only Bedrock item symbols.
 - Made the WorldGen menu explicit about live versus detached actions and selected the clearly visible maze recipe by default instead of the often-invisible flat surface patch.
 - Added zero-populator, no-op, recapture-retry, conflicting-edit, palette propagation, biome-capability, unrelated-edit preservation, loaded-chunk/write-verification, startup diagnostic, and menu-default regressions while retaining BDS 1.26.33, Endstone 0.11.6, CPython 3.14, and service ABI v2.
 
