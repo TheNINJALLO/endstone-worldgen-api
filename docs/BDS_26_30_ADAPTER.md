@@ -17,12 +17,13 @@ After BDS completes the original chunk request, the detour records the dimension
 3. Captures a palette-preserving detached `ChunkBuffer` on the primary thread (one per pump by default).
 4. Sends registered populators to the worker pool.
 5. Waits without blocking the server tick.
-6. Rejects biome edits, resolves and verifies every used palette descriptor, then commits changed blocks on the primary thread (one per pump by default).
-7. Calls `ChunkSource::flushThreadBatch()`.
+6. Skips unchanged results; otherwise recaptures the loaded chunk with bounded retries, rejects changed-cell conflicts, and merges only the populator delta into the fresh snapshot.
+7. Rejects biome edits, resolves and verifies every used palette descriptor, then commits changed blocks on the primary thread (one per pump by default).
+8. Calls `ChunkSource::flushThreadBatch()`.
 
 ## Service access
 
-Native clients compiled for service ABI 2 load `endstone:worldgen:v2` through Endstone's `ServiceManager` and register one or more worker-safe `IPopulator` instances. The versioned name makes mixed bridge/native releases fail lookup safely. A pipeline with no registered populators intentionally performs no world edits.
+Native clients compiled for service ABI 2 load `endstone:worldgen:v2` through Endstone's `ServiceManager` and register one or more worker-safe `IPopulator` instances. The versioned name makes mixed bridge/native releases fail lookup safely. A pipeline with no registered populators intentionally performs no world edits; this is the expected state when the API enables before its dependent consumers.
 
 ## Safety
 
@@ -31,7 +32,9 @@ Native clients compiled for service ABI 2 load `endstone:worldgen:v2` through En
   overflow is reported through `waiting_overflow_drops`.
 - In-flight requests are bounded and deduplicated.
 - Captures retry when the requested chunk is not ready yet.
-- Captures and commits have separate per-tick budgets. Raising them may increase tick latency.
+- Capture and commit require exact `ChunkState::Loaded`; invalid, generating, decoration, and lighting states are refused.
+- Changed cells containing block actors are refused because detached buffers do not preserve their NBT.
+- Initial captures and commits have separate per-tick budgets. A changed worker result performs one additional primary-thread recapture immediately before its conflict-checked delta merge; raising either budget may increase tick latency.
 - Exact runtime gating rejects unsupported builds.
 - The adapter restores its exact vtable entries when the final interceptor instance is disabled.
 

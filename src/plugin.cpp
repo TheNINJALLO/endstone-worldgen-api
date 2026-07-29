@@ -59,9 +59,11 @@ public:
             std::string(endstone_worldgen::WorldGenServiceName), provider_, *this,
             endstone::ServicePriority::Normal);
 
-        getLogger().warning(
-            "No native IPopulator is registered by default. Intercepted chunk requests have no automatic work; "
-            "explicit WorldGenService live recipes remain available.");
+        if (interception_installed) {
+            getLogger().info(
+                "Automatic ChunkSource interception is ready and awaiting a consumer IPopulator. "
+                "This is normal for the standalone API; /wg gen and /wg structure use the separate live-recipe path.");
+        }
 
         getServer().getScheduler().runTaskTimer(*this, [this]() { pump(); }, 1, 1);
     }

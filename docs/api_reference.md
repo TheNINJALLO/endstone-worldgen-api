@@ -74,9 +74,11 @@ chunk coordinates converted to `uint32`.
 Runs one of `flat`, `island`, `maze`, `ores`, `castle`, or `arena` through the
 exact adapter on the Endstone primary thread. `castle` and `arena` target a 3x3
 chunk area; other recipes target one chunk. All target chunks and complete
-runtime palettes are captured before the first write. Recipe descriptors are
-resolved through the running server, only explicitly selected cells change, and
-biomes are never edited.
+runtime palettes must be in exact `ChunkState::Loaded` and are captured before
+the first write. Recipe descriptors are resolved through the running server,
+only explicitly selected cells change, block-actor targets are refused, every
+changed runtime ID is read back through Endstone's public virtual BlockData
+boundary, and biomes are never edited.
 
 `anchor_y` is the visible surface/floor for `flat`, `island`, `maze`, `castle`,
 and `arena`. The command wheel supplies `floor(sender.location.y) - 1`. Their

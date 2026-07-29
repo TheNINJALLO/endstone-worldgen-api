@@ -460,6 +460,10 @@ class StudioWheelTests(unittest.TestCase):
         self.assertIsInstance(root_form, ActionForm)
         self.assertEqual(len(root_form.controls), 6)
         self.assertTrue(all(button.on_click is None for button in root_form.controls))
+        self.assertIn("write to the current world", root_form.content)
+        self.assertIn("never edit the live world", root_form.content)
+        self.assertIn("World Write", root_form.controls[0].text)
+        self.assertIn("No World Changes", root_form.controls[2].text)
         self.assertIn(player.unique_id, plugin.active_forms)
 
         self.assertTrue(plugin.on_command(player, command, ["menu"]))
@@ -572,6 +576,27 @@ class StudioWheelTests(unittest.TestCase):
             player.sent_forms[-1].on_submit(player, 0)
         handler.assert_called_once_with(player, ["flat"])
         self.assertEqual(bridge.generate_calls[-1][2:4], (2, -1))
+
+    def test_live_menu_defaults_to_a_visible_recipe_and_labels_hidden_work(self) -> None:
+        plugin, _sender = self.make_plugin()
+
+        live_player = FakePlayerSender()
+        self.assertTrue(plugin._open_recipe_form(live_player, "gen"))
+        live_dropdown = live_player.sent_forms[-1].controls[0]
+        self.assertEqual(
+            plugin._GENERATOR_RECIPES[live_dropdown.default_index], "maze"
+        )
+        self.assertIn("Clearly Visible", live_dropdown.options[live_dropdown.default_index])
+        self.assertTrue(any("Underground" in option for option in live_dropdown.options))
+        live_player.sent_forms[-1].on_close(live_player)
+
+        detached_player = FakePlayerSender()
+        self.assertTrue(plugin._open_recipe_form(detached_player, "buffer"))
+        detached_dropdown = detached_player.sent_forms[-1].controls[0]
+        self.assertTrue(
+            all("Detached Only" in option for option in detached_dropdown.options)
+        )
+        detached_player.sent_forms[-1].on_close(detached_player)
 
     def test_live_confirmation_back_and_cancel_never_write(self) -> None:
         plugin, _sender = self.make_plugin()
@@ -804,7 +829,11 @@ class StudioWheelTests(unittest.TestCase):
         self.addCleanup(enabled_plugin.on_disable)
         self.assertEqual(
             enabled_logger.infos,
-            ["WorldGen Studio enabled against the native endstone:worldgen:v2 service."],
+            [
+                "WorldGen Studio enabled against the native endstone:worldgen:v2 service; "
+                "live /wg gen and /wg structure writes are available, while detached "
+                "commands do not edit the world."
+            ],
         )
 
     def test_live_service_name_is_abi_versioned(self) -> None:
@@ -822,7 +851,7 @@ class StudioWheelTests(unittest.TestCase):
             return_value=bundled_bridge,
         ) as import_module:
             self.assertIs(
-                bridge_loader.import_live_bridge("0.4.6"), bundled_bridge
+                bridge_loader.import_live_bridge("0.4.7"), bundled_bridge
             )
         import_module.assert_called_once_with(
             "endstone_worldgen_studio._endstone_worldgen_live"
@@ -836,7 +865,7 @@ class StudioWheelTests(unittest.TestCase):
             side_effect=dependency_error,
         ) as import_module:
             with self.assertRaises(ModuleNotFoundError) as raised:
-                bridge_loader.import_live_bridge("0.4.6")
+                bridge_loader.import_live_bridge("0.4.7")
         self.assertIs(raised.exception, dependency_error)
         self.assertEqual(import_module.call_count, 1)
 
@@ -852,9 +881,9 @@ class StudioWheelTests(unittest.TestCase):
         ) as imported:
             with self.assertRaisesRegex(
                 ModuleNotFoundError,
-                "matching 0\\.4\\.6 CPython 3\\.14 platform wheel",
+                "matching 0\\.4\\.7 CPython 3\\.14 platform wheel",
             ):
-                bridge_loader.import_live_bridge("0.4.6")
+                bridge_loader.import_live_bridge("0.4.7")
         imported.assert_called_once_with(
             "endstone_worldgen_studio._endstone_worldgen_live"
         )
@@ -1082,7 +1111,8 @@ class StudioWheelTests(unittest.TestCase):
     def test_status_surfaces_zero_pipeline_and_failure_counters(self) -> None:
         plugin, sender = self.make_plugin()
         self.assertTrue(plugin.on_command(sender, SimpleNamespace(name="wg"), ["status"]))
-        self.assertTrue(any("0 native populators" in m for m in sender.messages))
+        self.assertTrue(any("Automatic interception is idle" in m for m in sender.messages))
+        self.assertTrue(any("does not affect /wg gen or /wg structure" in m for m in sender.messages))
         self.assertTrue(any("Capture retries/failures" in m and "2/3" in m for m in sender.messages))
         self.assertTrue(any("Commit failures" in m and "4" in m for m in sender.messages))
         self.assertTrue(any("Empty pipeline" in m and "5" in m for m in sender.messages))

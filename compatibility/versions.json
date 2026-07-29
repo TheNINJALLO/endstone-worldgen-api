@@ -1,7 +1,7 @@
 {
   "schema": 3,
   "project": "endstone-worldgen-api",
-  "api": "0.4.6",
+  "api": "0.4.7",
   "adapter_family": "minecraft-bedrock-26.30",
   "verified_source_adapters": [
     {
@@ -13,6 +13,8 @@
         "detached_chunk_capture",
         "worker_populator_dispatch",
         "controlled_chunk_commit",
+        "conflict_checked_delta_merge",
+        "loaded_chunk_write_readback",
         "palette_roundtrip",
         "chunk_source_probe",
         "flush_thread_batch",

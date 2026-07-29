@@ -23,19 +23,21 @@ disable the manual recipe capture/commit path.
 
 ### `/wg gen <flat|island|maze|ores> [cx cz]`
 
-Captures the target live chunk and applies a bounded built-in recipe. BlockData
+Requires and captures the target loaded chunk, then applies a bounded built-in recipe. BlockData
 descriptors are resolved by the exact server, untouched cells are preserved,
 and biomes are not edited. The green success message is sent only after native
-commit and flush both succeed, and includes the confirmed changed-block count
+runtime-ID readback, commit, and flush all succeed, and includes the confirmed changed-block count
 and exact changed Y range. `flat`, `island`, and `maze` use the block below the
 sender (`floor(sender Y) - 1`) as their visible surface/floor. `ores` instead
 scans natural stone/deepslate throughout the captured chunk and may write
-underground; its actual changed Y range is reported after the scan.
+underground; its actual changed Y range is reported after the scan. The menu
+defaults to `maze` because it is the most immediately visible smoke test.
 
 ### `/wg structure <castle|arena> [cx cz]`
 
 Applies a bounded live castle or arena recipe across the 3x3 area centered on
-the target chunk. All chunks are captured and validated before the first write.
+the target chunk. All nine chunks must already be loaded and are captured and
+validated before the first write.
 The castle or arena floor is anchored at `floor(sender Y) - 1`, and the command
 shows both the bounded recipe band and actual native changed Y range.
 

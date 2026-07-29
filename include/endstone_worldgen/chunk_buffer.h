@@ -11,6 +11,7 @@
 namespace endstone_worldgen {
 using DescriptorStateValue = std::variant<bool, std::int32_t, std::string>;
 using DescriptorStates = std::unordered_map<std::string, DescriptorStateValue>;
+using BiomeCells = std::unordered_map<std::uint32_t, std::uint32_t>;
 
 struct BlockDescriptor {
     std::string type{"minecraft:air"};
@@ -29,6 +30,9 @@ public:
     void replace(std::uint32_t from,std::uint32_t to);
     void setBiome(int x,int y,int z,std::uint32_t biome);
     [[nodiscard]] std::size_t biomeCellCount() const noexcept { return biomes_.size(); }
+    [[nodiscard]] const BiomeCells &biomeCells() const noexcept { return biomes_; }
+    void setBiomeCell(std::uint32_t key, std::uint32_t biome) { biomes_[key] = biome; }
+    void eraseBiomeCell(std::uint32_t key) noexcept { biomes_.erase(key); }
     void setPaletteEntry(std::uint32_t runtime_id, BlockDescriptor descriptor);
     [[nodiscard]] const BlockDescriptor *paletteEntry(std::uint32_t runtime_id) const noexcept;
     [[nodiscard]] std::size_t paletteSize() const noexcept { return palette_.size(); }
@@ -37,7 +41,7 @@ public:
 private:
     size_t index(int x,int y,int z) const;
     ChunkPos pos_; std::int32_t min_y_; std::int32_t max_y_; std::vector<std::uint32_t> blocks_;
-    std::unordered_map<std::uint32_t,std::uint32_t> biomes_;
+    BiomeCells biomes_;
     std::unordered_map<std::uint32_t,BlockDescriptor> palette_;
 };
 }
