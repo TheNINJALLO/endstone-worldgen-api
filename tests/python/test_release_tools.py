@@ -9,7 +9,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CONFIG = {"project": "worldgen","slug": "endstone-worldgen-api","plugin_prefix": "endstone_worldgen_bds_","bridge_prefix": "_endstone_worldgen_live","wheel_prefix": "endstone_worldgen_studio","version": "0.4.7"}
+CONFIG = {"project": "worldgen","slug": "endstone-worldgen-api","plugin_prefix": "endstone_worldgen_bds_","bridge_prefix": "_endstone_worldgen_live","wheel_prefix": "endstone_worldgen_studio","version": "0.4.8-alpha.1","python_version": "0.4.8a1"}
 
 
 class TestReleaseTools(unittest.TestCase):
@@ -35,8 +35,8 @@ class TestReleaseTools(unittest.TestCase):
                 f"{stem}-windows-x64.dll",
                 f"{stem}-windows-x64.zip",
                 f"{stem}-windows-x64.sha256",
-                f"{CONFIG['wheel_prefix']}-{CONFIG['version']}-cp314-cp314-linux_x86_64.whl",
-                f"{CONFIG['wheel_prefix']}-{CONFIG['version']}-cp314-cp314-win_amd64.whl",
+                f"{CONFIG['wheel_prefix']}-{CONFIG['python_version']}-cp314-cp314-linux_x86_64.whl",
+                f"{CONFIG['wheel_prefix']}-{CONFIG['python_version']}-cp314-cp314-win_amd64.whl",
             }
             for name in names:
                 (release / name).write_bytes(b"asset")
@@ -56,7 +56,7 @@ class TestReleaseTools(unittest.TestCase):
     def add_command_wheel(stage: Path) -> Path:
         wheel = (
             stage / "plugins" /
-            "endstone_worldgen_studio-0.4.7-cp314-cp314-win_amd64.whl"
+            "endstone_worldgen_studio-0.4.8a1-cp314-cp314-win_amd64.whl"
         )
         wheel.parent.mkdir(parents=True, exist_ok=True)
         bridges = sorted((stage / "python").glob("_endstone_worldgen_live.*"))

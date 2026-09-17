@@ -1,4 +1,28 @@
+## 0.4.8-alpha.1
+
+- Release the 1.26.51 / Endstone 0.11.11 compatibility preparation as source and a portable API wheel.
+- Native runtime qualification remains pending; see `RELEASE_NOTES.md`.
+
 ## 0.4.7
+
+## Unreleased ? BDS 1.26.51 / Endstone 0.11.11 target
+
+- Select game 1.26.51, actual server package 1.26.51.1, and Endstone 0.11.11.
+- Raise command-wheel requirements to Endstone >=0.11.11 with no upper bound.
+- Verify both official 1.26.51.1 downloads against Endstone's server metadata.
+- Record the v0.11.11 SDK commit and generated symbol-table fingerprints.
+- Default target preparation to this known release and retain 1.26.50.5 as history.
+- Keep native deployment qualification pending the adapter port and live tests.
+
+
+## Unreleased ? BDS 1.26.50.5 preparation
+
+- Record supplied Linux and Windows archive/executable fingerprints.
+- Accept Endstone >=0.11.10 in command wheels without an upper version bound.
+- Add target preparation and a gate that rejects unqualified native releases.
+- Keep old exact ABI profiles active until the new Endstone runtime is available
+  and new server layouts have been verified.
+
 
 - Reclassified the expected startup-time zero-populator state as informational: dependent native consumers register only after the WorldGen service is enabled, and `/wg gen` plus `/wg structure` use a separate live-recipe path.
 - Added conflict-safe automatic population commits. Worker results now skip unchanged chunks, retry bounded safety recaptures, merge block and supported-biome deltas into a fresh snapshot, propagate new palette descriptors, preserve unrelated live edits, and reject conflicts before commit.
