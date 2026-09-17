@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
-project(endstone_worldgen VERSION 0.4.7 LANGUAGES CXX)
+project(endstone_worldgen VERSION 0.4.8 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/SOURCE_RELEASE.json" ENDSTONE_WORLDGEN_RELEASE_JSON)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/SOURCE_RELEASE.json")
 string(JSON ENDSTONE_WORLDGEN_RELEASE_VERSION GET "${ENDSTONE_WORLDGEN_RELEASE_JSON}" version)
 string(REPLACE "." "\\." ENDSTONE_WORLDGEN_PROJECT_VERSION_REGEX "${PROJECT_VERSION}")
 if(NOT ENDSTONE_WORLDGEN_RELEASE_VERSION MATCHES "^${ENDSTONE_WORLDGEN_PROJECT_VERSION_REGEX}($|[-+])")
@@ -18,8 +19,8 @@ option(ENDSTONE_WORLDGEN_BUILD_PLUGIN "Build Endstone wrapper" OFF)
 option(ENDSTONE_WORLDGEN_BUILD_PYTHON "Build pybind11 module" OFF)
 option(ENDSTONE_WORLDGEN_BUILD_LIVE_PYTHON "Build the exact native status bridge" ON)
 option(ENDSTONE_WORLDGEN_BUILD_NATIVE_2630 "Build exact BDS 26.30-family adapter" ON)
-set(ENDSTONE_BDS_BUILD "1.26.33" CACHE STRING "Exact BDS build (only 1.26.33 is supported)")
-set_property(CACHE ENDSTONE_BDS_BUILD PROPERTY STRINGS "1.26.33")
+set(ENDSTONE_BDS_BUILD "1.26.51" CACHE STRING "Exact BDS build (only 1.26.51 is supported)")
+set_property(CACHE ENDSTONE_BDS_BUILD PROPERTY STRINGS "1.26.51")
 string(REPLACE "." "_" ENDSTONE_BDS_BUILD_FILE "${ENDSTONE_BDS_BUILD}")
 
 add_library(endstone_worldgen_core STATIC
@@ -37,6 +38,9 @@ target_compile_features(endstone_worldgen_core PUBLIC cxx_std_20)
 configure_file(include/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/version.h @ONLY)
 
 if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
+    if(WIN32)
+        message(FATAL_ERROR "BDS 1.26.51 chunk-source hooks are currently qualified only for Linux x86-64")
+    endif()
     if(NOT DEFINED ENDSTONE_CONAN_BDS_BUILD)
         message(FATAL_ERROR
             "ENDSTONE_CONAN_BDS_BUILD is missing; configure the exact plugin with this project's Conan toolchain")
@@ -46,11 +50,11 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
             "Conan dependencies target BDS ${ENDSTONE_CONAN_BDS_BUILD}, but CMake targets ${ENDSTONE_BDS_BUILD}")
     endif()
 
-    if(ENDSTONE_BDS_BUILD STREQUAL "1.26.33")
-        set(ENDSTONE_EXACT_TAG "v0.11.6")
+    if(ENDSTONE_BDS_BUILD STREQUAL "1.26.51")
+        set(ENDSTONE_EXACT_TAG "v0.11.11")
     else()
         message(FATAL_ERROR
-            "The exact WorldGen adapter supports only BDS 1.26.33 with Endstone v0.11.6")
+            "The exact WorldGen adapter supports only BDS 1.26.51 with Endstone v0.11.11")
     endif()
     string(REGEX REPLACE "^v" "" ENDSTONE_EXACT_VERSION "${ENDSTONE_EXACT_TAG}")
 
@@ -100,7 +104,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
 
     set(ENDSTONE_RESULT_H "${endstone_SOURCE_DIR}/src/bedrock/platform/result.h")
     if(NOT EXISTS "${ENDSTONE_RESULT_H}")
-        message(FATAL_ERROR "Endstone v0.11.6 result.h was not found at ${ENDSTONE_RESULT_H}")
+        message(FATAL_ERROR "Endstone v0.11.11 result.h was not found at ${ENDSTONE_RESULT_H}")
     endif()
     file(READ "${ENDSTONE_RESULT_H}" ENDSTONE_RESULT_H_CONTENT)
     string(REPLACE "std::format(\"Error: {}\\nCall stack:{}\", error, call_stack)" "std::string(\"Error: \") + error" ENDSTONE_RESULT_H_CONTENT "${ENDSTONE_RESULT_H_CONTENT}")
@@ -110,7 +114,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     string(FIND "${ENDSTONE_RESULT_H_CONTENT}" "${ENDSTONE_RESULT_ERROR_CODE_MESSAGE}" ENDSTONE_RESULT_ERROR_CODE_MESSAGE_INDEX)
     if(ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX EQUAL -1 AND ENDSTONE_RESULT_ERROR_CODE_MESSAGE_INDEX EQUAL -1)
         message(FATAL_ERROR
-            "Endstone v0.11.6 result.h no longer contains the expected std::error_code formatting expression")
+            "Endstone v0.11.11 result.h no longer contains the expected std::error_code formatting expression")
     endif()
     if(NOT ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX EQUAL -1)
         string(REPLACE
@@ -152,6 +156,15 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
         CXX_VISIBILITY_PRESET hidden
         VISIBILITY_INLINES_HIDDEN ON
     )
+    if(UNIX AND NOT APPLE)
+        # Exceptions can cross the host/plugin boundary. Use the host's shared
+        # unwinder; a hidden static libgcc copy aborts on host unwind contexts.
+        get_target_property(native_link_libraries worldgen_api LINK_LIBRARIES)
+        list(REMOVE_ITEM native_link_libraries -static-libgcc)
+        set_property(TARGET worldgen_api PROPERTY LINK_LIBRARIES "${native_link_libraries}")
+        target_link_libraries(worldgen_api PRIVATE -shared-libgcc)
+    endif()
+
     target_include_directories(worldgen_api PRIVATE
         include
         ${CMAKE_CURRENT_BINARY_DIR}/include
@@ -227,7 +240,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
             target_link_options(_endstone_worldgen_live PRIVATE
                 -stdlib=libc++ "LINKER:--exclude-libs,ALL")
             target_link_libraries(_endstone_worldgen_live PRIVATE
-                -static-libgcc
+                -shared-libgcc
                 -static-libstdc++
                 libc++.a
                 libc++abi.a
@@ -260,7 +273,11 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
             LIBRARY DESTINATION python COMPONENT worldgen_package
         )
     endif()
-    install(DIRECTORY python/endstone_worldgen DESTINATION python COMPONENT worldgen_package)
+    install(DIRECTORY python/endstone_worldgen DESTINATION python COMPONENT worldgen_package
+        PATTERN "__pycache__" EXCLUDE
+        PATTERN "*.pyc" EXCLUDE
+        PATTERN "*.pyo" EXCLUDE
+    )
     install(DIRECTORY include/endstone_worldgen DESTINATION include COMPONENT worldgen_package)
     install(FILES
         README.md

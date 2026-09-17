@@ -22,7 +22,7 @@ CONFIGS = {
     "endstone-worldgen-api": {
         "bridge_module": "_endstone_worldgen_live",
         "wheel_package": "endstone_worldgen_studio",
-        "exact_targets": {"1.26.33": "v0.11.6"},
+        "exact_targets": {"1.26.51": "v0.11.11"},
         "package_init": "python/endstone_worldgen/__init__.py",
         "wheel_pyproject": "examples/python/world_gen_studio_plugin/pyproject.toml",
         "wheel_plugin": (
@@ -94,7 +94,7 @@ def main() -> int:
                 r'^dependencies\s*=\s*\[\s*"([^"]+)"\s*,?\s*\]',
                 "test wheel dependency",
             ),
-            "endstone==0.11.6",
+            "endstone>=0.11.11",
         ),
         "test plugin version": (
             capture(config["wheel_plugin"], r'^\s+version\s*=\s*"([^"]+)"', "plugin version"),
@@ -238,7 +238,7 @@ def main() -> int:
         )
         if result_format_anchor not in cmake_text:
             failures.append(
-                "CMake must guard the Endstone v0.11.6 std::error_code format expression"
+                "CMake must guard the Endstone v0.11.11 std::error_code format expression"
             )
         if 'set(ENDSTONE_RESULT_ERROR_CODE_MESSAGE "error_info.error.message()")' not in cmake_text:
             failures.append(

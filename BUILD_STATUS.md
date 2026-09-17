@@ -1,35 +1,16 @@
 # Build status
 
-Version: **0.4.7**
+Version: **0.4.8**
 
-## Implemented
+[Native release v0.4.8](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.8) targets Endstone 0.11.11, BDS package
+1.26.51.1/runtime 26.51, and CPython 3.14 on Linux x86-64.
 
-- Portable C++ WorldGen core and tests
-- Python package and tests
-- Exact BDS 1.26.33 / Endstone v0.11.6 adapter source
-- Native `ChunkSource` request interception pipeline
-- Detached worker processing and primary-thread commits
-- Deterministic native install and packaging scripts
-- GitHub Actions Windows x64 and Linux x64 exact builds for BDS 1.26.33
-- Downloadable workflow artifacts on every push
-- Automatic tagged GitHub Releases
-- Raw plugin, ZIP package, manifest, and SHA-256 outputs
-- Verified CPython 3.14 platform command wheels with a bundled native status bridge
-- Build-time rejection of unresolved Bedrock ABI symbols and release-time RPATH validation
-- ABI-versioned `endstone:worldgen:v2` service with primary-thread live recipes
-- Commit-and-flush-confirmed `/wg gen` and `/wg structure` command paths anchored
-  at the block below the sender, with exact native changed-Y reporting
-- Exact loaded-state and block-actor preflight plus public virtual runtime-ID readback verification
-- Conflict-safe automatic-populator block/biome delta merge with bounded recapture retries
-- Explicit live-write/detached menu labels with a visible maze default
+Pinned SDK commit: `37b395378d91d6d20f1c52bf9d79dbd20e152458`.
 
-## Validation boundary
+## Validation
 
-Portable builds and package tooling are validated locally. Exact native binaries are compiled by the included GitHub Actions runners and still require first-load testing against the matching BDS executable before production use.
+42-entry ChunkSource vtable verified; three dimension sources hooked; all six live recipes passed capture/commit/flush checks with zero unconfirmed blocks; clean shutdown.
 
-## GitHub Actions toolchain hotfix
+Native C++ and Python test suites, binary identity checks, package checks, and deployment evidence accompany the release. Enchantment additionally requires ASan/UBSan and `production_ready: true` from its live production check.
 
-- Linux exact builds run on Ubuntu 22.04 with Clang 18 and libc++ 18.
-- Both platforms invoke `scripts/build_exact.py`, so executable-bit loss cannot cause exit code 126.
-- Windows exact builds use clang-cl, lld-link, and Ninja inside the Visual Studio 2022 developer environment.
-- Failed exact jobs upload CMake diagnostics for inspection.
+Endstone package metadata accepts **>=0.11.11** with no upper bound. Native hooks require the verified BDS 1.26.51.1 / Endstone 0.11.11 binary pair; later private runtimes need separate qualification.

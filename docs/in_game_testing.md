@@ -6,7 +6,7 @@ The release includes the `endstone_worldgen_studio` test-plugin wheel.
 
 1. Stop the server and remove every older WorldGen Studio wheel from `plugins/`.
 2. Remove any manually copied top-level `_endstone_worldgen_live` file from `plugins/.local`.
-3. Extract the BDS 1.26.33 ZIP matching the server platform and copy both files from its `plugins/` directory into the server's `plugins/` directory.
+3. Extract the BDS 1.26.51 ZIP matching the server platform and copy both files from its `plugins/` directory into the server's `plugins/` directory.
 4. Restart Endstone and run `/wg status`.
 
 The wheel registers Endstone entry point `worldgen-studio`, command `/wg`, and

@@ -1,28 +1,47 @@
 {
   "name": "endstone-worldgen-api",
-  "version": "0.4.7",
-  "adapter_family": "Minecraft Bedrock 26.30",
+  "version": "0.4.8",
+  "adapter_family": "minecraft-bedrock-26.51",
   "supported_bds": [
-    "1.26.33"
+    "1.26.51"
   ],
   "endstone_tags": [
-    "v0.11.6"
+    "v0.11.11"
   ],
   "portable_tests": "included in GitHub Actions",
-  "native_validation": "exact adapter build matrix; stage-server runtime validation required",
+  "native_validation": "Passed native C++ and Python tests, exact binary checks, and disposable live server checks on Linux x86-64; see compatibility/native-qualification.json",
   "github_actions": {
     "push_artifacts": true,
     "tagged_releases": true,
     "platforms": [
-      "linux-x64",
-      "windows-x64"
+      "linux-x64"
     ],
     "bds": [
-      "1.26.33"
+      "1.26.51"
     ],
-    "linux_runner": "ubuntu-22.04 + clang-18 + libc++18 + Ninja",
+    "linux_runner": "ubuntu-22.04 + clang-20 + libc++20 + Ninja",
     "windows_toolchain": "Visual Studio environment + clang-cl + lld-link + Ninja + Conan 2",
     "failure_diagnostics": true,
     "dependency_source": "Endstone Cloudsmith Conan remote + Conan Center"
-  }
+  },
+  "endstone_requirement": ">=0.11.11",
+  "pending_targets": [],
+  "historical_preparation_profiles": [
+    "compatibility/bds-1.26.50.5.json"
+  ],
+  "python_version": "0.4.8",
+  "release_channel": "native-release",
+  "native_release_ready": true,
+  "qualified_targets": [
+    {
+      "game_version": "1.26.51",
+      "bds_package": "1.26.51.1",
+      "endstone": "0.11.11",
+      "profile": "compatibility/bds-1.26.51.json",
+      "status": "qualified-linux-x64",
+      "platforms": [
+        "linux-x64"
+      ]
+    }
+  ]
 }

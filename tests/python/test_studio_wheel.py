@@ -358,7 +358,7 @@ class StudioWheelTests(unittest.TestCase):
         metadata = tomllib.loads((PLUGIN_PROJECT / "pyproject.toml").read_text("utf-8"))
         project = metadata["project"]
         self.assertEqual(project["requires-python"], "==3.14.*")
-        self.assertEqual(project["dependencies"], ["endstone==0.11.6"])
+        self.assertEqual(project["dependencies"], ["endstone>=0.11.11"])
         self.assertEqual(
             project["entry-points"]["endstone"],
             {"worldgen-studio": "endstone_worldgen_studio:WorldGenStudioPlugin"},
@@ -851,7 +851,7 @@ class StudioWheelTests(unittest.TestCase):
             return_value=bundled_bridge,
         ) as import_module:
             self.assertIs(
-                bridge_loader.import_live_bridge("0.4.7"), bundled_bridge
+                bridge_loader.import_live_bridge("0.4.8"), bundled_bridge
             )
         import_module.assert_called_once_with(
             "endstone_worldgen_studio._endstone_worldgen_live"
@@ -865,7 +865,7 @@ class StudioWheelTests(unittest.TestCase):
             side_effect=dependency_error,
         ) as import_module:
             with self.assertRaises(ModuleNotFoundError) as raised:
-                bridge_loader.import_live_bridge("0.4.7")
+                bridge_loader.import_live_bridge("0.4.8")
         self.assertIs(raised.exception, dependency_error)
         self.assertEqual(import_module.call_count, 1)
 
@@ -881,9 +881,9 @@ class StudioWheelTests(unittest.TestCase):
         ) as imported:
             with self.assertRaisesRegex(
                 ModuleNotFoundError,
-                "matching 0\\.4\\.7 CPython 3\\.14 platform wheel",
+                "matching 0\\.4\\.8 CPython 3\\.14 platform wheel",
             ):
-                bridge_loader.import_live_bridge("0.4.7")
+                bridge_loader.import_live_bridge("0.4.8")
         imported.assert_called_once_with(
             "endstone_worldgen_studio._endstone_worldgen_live"
         )
