@@ -2,8 +2,8 @@
 
 | BDS build | Endstone tag | Runtime result |
 |---|---|---|
-| 1.26.33 | v0.11.6 | accepted |
-| 1.26.33 with any other Endstone version | mismatch | refused |
+| 1.26.51 | v0.11.11 | accepted |
+| 1.26.51 with any other Endstone version | mismatch | refused |
 | anything else | none | refused |
 
 ## Native hook path
@@ -41,5 +41,5 @@ Native clients compiled for service ABI 2 load `endstone:worldgen:v2` through En
 ## Build
 
 ```bash
-./scripts/build_exact.sh 1.26.33
+./scripts/build_exact.sh 1.26.51
 ```

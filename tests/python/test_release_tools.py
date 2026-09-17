@@ -9,7 +9,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 
 ROOT = Path(__file__).resolve().parents[2]
-CONFIG = {"project": "worldgen","slug": "endstone-worldgen-api","plugin_prefix": "endstone_worldgen_bds_","bridge_prefix": "_endstone_worldgen_live","wheel_prefix": "endstone_worldgen_studio","version": "0.4.8-alpha.1","python_version": "0.4.8a1"}
+CONFIG = {"project": "worldgen","slug": "endstone-worldgen-api","plugin_prefix": "endstone_worldgen_bds_","bridge_prefix": "_endstone_worldgen_live","wheel_prefix": "endstone_worldgen_studio","version": "0.4.8","python_version": "0.4.8"}
 
 
 class TestReleaseTools(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestReleaseTools(unittest.TestCase):
         scratch_root.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=scratch_root) as temporary:
             release = Path(temporary)
-            stem = f"{CONFIG['slug']}-v{CONFIG['version']}-bds-1.26.33"
+            stem = f"{CONFIG['slug']}-v{CONFIG['version']}-bds-1.26.51"
             names = {
                 f"{stem}-linux-x64.so",
                 f"{stem}-linux-x64.zip",
@@ -42,7 +42,7 @@ class TestReleaseTools(unittest.TestCase):
                 (release / name).write_bytes(b"asset")
             common = (
                 "--slug", CONFIG["slug"], "--version", CONFIG["version"],
-                "--bds", "1.26.33", "--release-dir", str(release),
+                "--bds", "1.26.51", "--release-dir", str(release),
             )
             self.run_tool("verify_combined_release_assets.py", *common)
             (release / "unexpected.txt").write_bytes(b"unexpected")
@@ -56,7 +56,7 @@ class TestReleaseTools(unittest.TestCase):
     def add_command_wheel(stage: Path) -> Path:
         wheel = (
             stage / "plugins" /
-            "endstone_worldgen_studio-0.4.8a1-cp314-cp314-win_amd64.whl"
+            "endstone_worldgen_studio-0.4.8-cp314-cp314-win_amd64.whl"
         )
         wheel.parent.mkdir(parents=True, exist_ok=True)
         bridges = sorted((stage / "python").glob("_endstone_worldgen_live.*"))
@@ -95,7 +95,7 @@ class TestReleaseTools(unittest.TestCase):
 
             common = (
                 "--version", CONFIG["version"],
-                "--bds", "1.26.33",
+                "--bds", "1.26.51",
                 "--platform", "windows-x64",
             )
             self.run_tool(
@@ -139,7 +139,7 @@ class TestReleaseTools(unittest.TestCase):
             bridge.write_bytes(b"not-a-pe-binary")
             self.add_command_wheel(stage)
             common = (
-                "--version", CONFIG["version"], "--bds", "1.26.33",
+                "--version", CONFIG["version"], "--bds", "1.26.51",
                 "--platform", "windows-x64",
             )
             self.run_tool(
@@ -177,7 +177,7 @@ class TestReleaseTools(unittest.TestCase):
                     bridge.parent.mkdir(parents=True, exist_ok=True)
                     bridge.write_bytes(b"MZ" + bytes(range(32)))
                 common = (
-                    "--version", CONFIG["version"], "--bds", "1.26.33",
+                    "--version", CONFIG["version"], "--bds", "1.26.51",
                     "--platform", "windows-x64",
                 )
                 self.run_tool(
@@ -206,7 +206,7 @@ class TestReleaseTools(unittest.TestCase):
             bridge.write_bytes(b"MZ" + bytes(range(32)))
             self.add_command_wheel(stage)
             common = (
-                "--version", CONFIG["version"], "--bds", "1.26.33",
+                "--version", CONFIG["version"], "--bds", "1.26.51",
                 "--platform", "windows-x64",
             )
             self.run_tool(
@@ -230,7 +230,7 @@ class TestReleaseTools(unittest.TestCase):
                 "package_release.py",
                 "--project", CONFIG["project"],
                 "--version", "../escape",
-                "--bds", "1.26.33",
+                "--bds", "1.26.51",
                 "--platform", "windows-x64",
                 "--stage", str(stage),
                 "--release-dir", str(Path(temporary) / "release"),

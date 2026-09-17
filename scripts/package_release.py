@@ -21,7 +21,7 @@ PROJECTS = {
         "slug": "endstone-worldgen-api",
         "plugin_prefix": "endstone_worldgen_bds_",
         "wheel_prefix": "endstone_worldgen_studio",
-        "supported_bds": {"1.26.33"},
+        "supported_bds": {"1.26.51"},
     },
 }
 SAFE_COMPONENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")

@@ -2,11 +2,11 @@
   "schema": 3,
   "project": "endstone-worldgen-api",
   "api": "0.4.8",
-  "adapter_family": "minecraft-bedrock-26.30",
+  "adapter_family": "minecraft-bedrock-26.51",
   "verified_source_adapters": [
     {
-      "bds": "1.26.33",
-      "endstone": "0.11.6",
+      "bds": "1.26.51",
+      "endstone": "0.11.11",
       "features": [
         "exact_chunk_request_hooks",
         "bounded_native_queue",
@@ -26,16 +26,20 @@
   "default_mode": "post_processing",
   "policy": "exact runtime BDS build and mapped Endstone version verification with vanilla fallback",
   "endstone_requirement": ">=0.11.11",
-  "pending_targets": [
+  "pending_targets": [],
+  "historical_preparation_profiles": [
+    "compatibility/bds-1.26.50.5.json"
+  ],
+  "qualified_targets": [
     {
       "game_version": "1.26.51",
       "bds_package": "1.26.51.1",
       "endstone": "0.11.11",
       "profile": "compatibility/bds-1.26.51.json",
-      "status": "pending-native-adapter-qualification"
+      "status": "qualified-linux-x64",
+      "platforms": [
+        "linux-x64"
+      ]
     }
-  ],
-  "historical_preparation_profiles": [
-    "compatibility/bds-1.26.50.5.json"
   ]
 }

@@ -4,9 +4,9 @@ from conan.tools.cmake import CMakeDeps, CMakeToolchain
 
 class ExactEndstoneDependencies(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
-    options = {"bds_build": ["1.26.33"]}
+    options = {"bds_build": ["1.26.51"]}
     default_options = {
-        "bds_build": "1.26.33",
+        "bds_build": "1.26.51",
         "boost/*:header_only": True,
         "date/*:header_only": True,
         "raknet/*:minecraft_version": "r26u3",
@@ -14,7 +14,7 @@ class ExactEndstoneDependencies(ConanFile):
 
     def requirements(self):
         # These private headers cross the plugin ABI boundary. Keep their
-        # dependency graph pinned to Endstone v0.11.6 for BDS 1.26.33.
+        # dependency graph pinned to Endstone v0.11.11 for BDS 1.26.51.
         self.requires("base64/0.5.2")
         self.requires("concurrentqueue/1.0.4")
         self.requires("funchook/1.1.3")

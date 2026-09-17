@@ -73,7 +73,7 @@ bool isSafeEndstoneSuffix(std::string_view suffix) noexcept {
 
 bool isSupportedBds2630Build(std::string_view build) noexcept {
     build = canonicalBdsBuild(build);
-    return build == "26.33";
+    return build == "26.51";
 }
 
 bool isExpectedBds2630Build(std::string_view runtime_build,
