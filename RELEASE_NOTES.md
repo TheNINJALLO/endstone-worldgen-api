@@ -1,8 +1,10 @@
-# Endstone WorldGen API v0.4.8
+> Endstone-only release v0.4.9. BDS remains 1.26.51.1.
 
-Linux x86-64 native release for Minecraft **1.26.51**, BDS **1.26.51.1**, and Endstone **0.11.11**, with matching CPython **3.14** command wheels.
+# Endstone WorldGen API v0.4.9
 
-Endstone package metadata accepts **>=0.11.11** with no upper bound. Native hooks require the verified BDS 1.26.51.1 / Endstone 0.11.11 binary pair; later private runtimes need separate qualification.
+Linux x86-64 native release for Minecraft **1.26.51**, BDS **1.26.51.1**, and Endstone **0.11.12**, with matching CPython **3.14** command wheels.
+
+Endstone package metadata accepts **>=0.11.11** with no upper bound. Native hooks require the verified BDS 1.26.51.1 / Endstone 0.11.12 binary pair; later private runtimes need separate qualification.
 
 Includes the native Linux `.so`, matching command wheel, deployment archive, source/SDK assets, and SHA-256 checksums.
 

@@ -2,7 +2,7 @@
 
 | BDS build | Endstone tag | Runtime result |
 |---|---|---|
-| 1.26.51 | v0.11.11 | accepted |
+| 1.26.51 | v0.11.12 | accepted |
 | 1.26.51 with any other Endstone version | mismatch | refused |
 | anything else | none | refused |
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(endstone_worldgen VERSION 0.4.8 LANGUAGES CXX)
+project(endstone_worldgen VERSION 0.4.9 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -51,10 +51,10 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     endif()
 
     if(ENDSTONE_BDS_BUILD STREQUAL "1.26.51")
-        set(ENDSTONE_EXACT_TAG "v0.11.11")
+        set(ENDSTONE_EXACT_TAG "v0.11.12")
     else()
         message(FATAL_ERROR
-            "The exact WorldGen adapter supports only BDS 1.26.51 with Endstone v0.11.11")
+            "The exact WorldGen adapter supports only BDS 1.26.51 with Endstone v0.11.12")
     endif()
     string(REGEX REPLACE "^v" "" ENDSTONE_EXACT_VERSION "${ENDSTONE_EXACT_TAG}")
 
@@ -104,7 +104,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
 
     set(ENDSTONE_RESULT_H "${endstone_SOURCE_DIR}/src/bedrock/platform/result.h")
     if(NOT EXISTS "${ENDSTONE_RESULT_H}")
-        message(FATAL_ERROR "Endstone v0.11.11 result.h was not found at ${ENDSTONE_RESULT_H}")
+        message(FATAL_ERROR "Endstone v0.11.12 result.h was not found at ${ENDSTONE_RESULT_H}")
     endif()
     file(READ "${ENDSTONE_RESULT_H}" ENDSTONE_RESULT_H_CONTENT)
     string(REPLACE "std::format(\"Error: {}\\nCall stack:{}\", error, call_stack)" "std::string(\"Error: \") + error" ENDSTONE_RESULT_H_CONTENT "${ENDSTONE_RESULT_H_CONTENT}")
@@ -114,7 +114,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     string(FIND "${ENDSTONE_RESULT_H_CONTENT}" "${ENDSTONE_RESULT_ERROR_CODE_MESSAGE}" ENDSTONE_RESULT_ERROR_CODE_MESSAGE_INDEX)
     if(ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX EQUAL -1 AND ENDSTONE_RESULT_ERROR_CODE_MESSAGE_INDEX EQUAL -1)
         message(FATAL_ERROR
-            "Endstone v0.11.11 result.h no longer contains the expected std::error_code formatting expression")
+            "Endstone v0.11.12 result.h no longer contains the expected std::error_code formatting expression")
     endif()
     if(NOT ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX EQUAL -1)
         string(REPLACE
