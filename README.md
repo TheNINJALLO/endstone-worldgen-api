@@ -1,18 +1,18 @@
 # Endstone WorldGen API
 
-## Endstone 0.11.12 update: v0.4.9
+## Endstone 0.11.13 update: v0.4.10
 
-This release targets **Endstone 0.11.12**, unchanged **BDS 1.26.51.1 / runtime 26.51**, and **CPython 3.14** on Linux x86-64. See [build status](BUILD_STATUS.md) for validation.
+This release targets **Endstone 0.11.13**, **BDS 1.26.52.3 / runtime 26.52**, and **CPython 3.14** on Linux x86-64. Network protocol remains **2193**. See [build status](BUILD_STATUS.md) for validation.
 
-The package requirement remains **Endstone >=0.11.11** without an upper bound; these native binaries require the exact **0.11.12** runtime. Rebuild or install the matching native plugin and command wheel together.
+The package requirement remains **Endstone >=0.11.11** without an upper bound; these native binaries require the exact **0.11.13** runtime. Rebuild or install the matching native plugin and command wheel together.
 
-Download [v0.4.9](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.9) for **Endstone 0.11.12**.
+Download [v0.4.10](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.10) for **Endstone 0.11.13**.
 
-[![Version](https://img.shields.io/badge/version-v0.4.9-blue.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.9)
-[![Endstone](https://img.shields.io/badge/Endstone-v0.11.12-emerald.svg?style=for-the-badge)](https://github.com/EndstoneMC/endstone)
-[![BDS Version](https://img.shields.io/badge/BDS-1.26.51-purple.svg?style=for-the-badge)](https://www.minecraft.net/en-us/download/server/bedrock)
+[![Version](https://img.shields.io/badge/version-v0.4.10-blue.svg?style=for-the-badge)](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.10)
+[![Endstone](https://img.shields.io/badge/Endstone-v0.11.13-emerald.svg?style=for-the-badge)](https://github.com/EndstoneMC/endstone)
+[![BDS Version](https://img.shields.io/badge/BDS-1.26.52-purple.svg?style=for-the-badge)](https://www.minecraft.net/en-us/download/server/bedrock)
 [![Build Status](https://github.com/TheNINJALLO/endstone-worldgen-api/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/TheNINJALLO/endstone-worldgen-api/actions/workflows/ci.yml)
-[![Platform](https://img.shields.io/badge/platform-Linux-orange.svg?style=for-the-badge)](#-direct-release-downloads-v049)
+[![Platform](https://img.shields.io/badge/platform-Linux-orange.svg?style=for-the-badge)](#-direct-release-downloads-v0410)
 [![Language](https://img.shields.io/badge/language-C%2B%2B20%20%7C%20Python-3776AB.svg?style=for-the-badge)](#-c--python-api-quickstart)
 [![License](https://img.shields.io/badge/license-Apache--2.0-green.svg?style=for-the-badge)](LICENSE)
 
@@ -31,15 +31,15 @@ Comprehensive guides, architecture diagrams, stress testing tutorials, and full 
 
 ---
 
-## 📦 Direct Release Downloads (`v0.4.9`)
+## 📦 Direct Release Downloads (`v0.4.10`)
 
-Use the **complete ZIP** matching BDS 1.26.51 and the server platform. It contains both the native plugin and the matching self-contained `/wg` command wheel. The raw library is for native-API-only/manual installations.
+Use the **complete ZIP** matching BDS 1.26.52 and the server platform. It contains both the native plugin and the matching self-contained `/wg` command wheel. The raw library is for native-API-only/manual installations.
 
 | Platform | BDS Version | Artifact Filename | Direct Download |
 | :--- | :--- | :--- | :--- |
-| **Linux x64 ZIP (recommended)** | `1.26.51` | `endstone-worldgen-api-v0.4.9-bds-1.26.51-linux-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.9/endstone-worldgen-api-v0.4.9-bds-1.26.51-linux-x64.zip) |
-| **Linux x64 raw plugin** | `1.26.51` | `endstone-worldgen-api-v0.4.9-bds-1.26.51-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.9/endstone-worldgen-api-v0.4.9-bds-1.26.51-linux-x64.so) |
-| **Linux `/wg` wheel** | `CPython 3.14` | `endstone_worldgen_studio-0.4.9-cp314-cp314-linux_x86_64.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.9/endstone_worldgen_studio-0.4.9-cp314-cp314-linux_x86_64.whl) |
+| **Linux x64 ZIP (recommended)** | `1.26.52` | `endstone-worldgen-api-v0.4.10-bds-1.26.52-linux-x64.zip` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.10/endstone-worldgen-api-v0.4.10-bds-1.26.52-linux-x64.zip) |
+| **Linux x64 raw plugin** | `1.26.52` | `endstone-worldgen-api-v0.4.10-bds-1.26.52-linux-x64.so` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.10/endstone-worldgen-api-v0.4.10-bds-1.26.52-linux-x64.so) |
+| **Linux `/wg` wheel** | `CPython 3.14` | `endstone_worldgen_studio-0.4.10-cp314-cp314-linux_x86_64.whl` | [Download](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/download/v0.4.10/endstone_worldgen_studio-0.4.10-cp314-cp314-linux_x86_64.whl) |
 
 ---
 
@@ -117,12 +117,12 @@ void registerPopulator(
 
 The repository includes the [`endstone_worldgen_studio`](examples/python/world_gen_studio_plugin/) command plugin. Choose the platform-specific **CPython 3.14** wheel from the same exact build as the native plugin; its `_endstone_worldgen_live` bridge is bundled inside the wheel.
 
-Stop the server and remove older WorldGen Studio wheels before copying v0.4.9; leaving multiple versions in `plugins/` can make Endstone install them in an undefined order.
+Stop the server and remove older WorldGen Studio wheels before copying v0.4.10; leaving multiple versions in `plugins/` can make Endstone install them in an undefined order.
 
 ```bash
 # Linux example: copy both files from the complete ZIP's plugins/ directory.
 cp endstone_worldgen_bds_1_26_33.so /path/to/endstone/plugins/
-cp endstone_worldgen_studio-0.4.9-cp314-cp314-linux_x86_64.whl /path/to/endstone/plugins/
+cp endstone_worldgen_studio-0.4.10-cp314-cp314-linux_x86_64.whl /path/to/endstone/plugins/
 ```
 
 ### In-Game Command Reference

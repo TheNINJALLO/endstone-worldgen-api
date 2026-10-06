@@ -135,7 +135,7 @@ std::shared_ptr<LevelChunk> getOrLoadChunkDetour(ChunkSource *self, const ::Chun
 
 // ChunkSource has one destructor vtable slot under MSVC and the Itanium ABI has
 // complete + deleting destructor slots. These ordinals are pinned to the exact
-// BDS 1.26.51.1 vtables and are runtime-gated by BDS build. The Linux
+// BDS 1.26.52.3 vtables and are runtime-gated by BDS build. The Linux
 // ChunkSource, MainChunkSource, NetworkChunkSource and WorldLimitChunkSource
 // tables contain 42 entries; the SDK declaration omits two trailing methods.
 #ifdef _WIN32

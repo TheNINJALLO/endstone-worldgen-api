@@ -78,7 +78,7 @@ class WorldGenStudioPlugin(Plugin):
     """Exercise live native recipes and detached scheduler buffers from commands."""
 
     api_version = "0.11"
-    version = "0.4.9"
+    version = "0.4.10"
     description = "Interactive live WorldGen and detached-buffer test suite"
     depend = ["worldgen_api"]
 

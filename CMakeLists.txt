@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(endstone_worldgen VERSION 0.4.9 LANGUAGES CXX)
+project(endstone_worldgen VERSION 0.4.10 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,8 +19,8 @@ option(ENDSTONE_WORLDGEN_BUILD_PLUGIN "Build Endstone wrapper" OFF)
 option(ENDSTONE_WORLDGEN_BUILD_PYTHON "Build pybind11 module" OFF)
 option(ENDSTONE_WORLDGEN_BUILD_LIVE_PYTHON "Build the exact native status bridge" ON)
 option(ENDSTONE_WORLDGEN_BUILD_NATIVE_2630 "Build exact BDS 26.30-family adapter" ON)
-set(ENDSTONE_BDS_BUILD "1.26.51" CACHE STRING "Exact BDS build (only 1.26.51 is supported)")
-set_property(CACHE ENDSTONE_BDS_BUILD PROPERTY STRINGS "1.26.51")
+set(ENDSTONE_BDS_BUILD "1.26.52" CACHE STRING "Exact BDS build (only 1.26.52 is supported)")
+set_property(CACHE ENDSTONE_BDS_BUILD PROPERTY STRINGS "1.26.52")
 string(REPLACE "." "_" ENDSTONE_BDS_BUILD_FILE "${ENDSTONE_BDS_BUILD}")
 
 add_library(endstone_worldgen_core STATIC
@@ -39,7 +39,7 @@ configure_file(include/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/version.
 
 if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     if(WIN32)
-        message(FATAL_ERROR "BDS 1.26.51 chunk-source hooks are currently qualified only for Linux x86-64")
+        message(FATAL_ERROR "BDS 1.26.52 chunk-source hooks are currently qualified only for Linux x86-64")
     endif()
     if(NOT DEFINED ENDSTONE_CONAN_BDS_BUILD)
         message(FATAL_ERROR
@@ -50,11 +50,11 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
             "Conan dependencies target BDS ${ENDSTONE_CONAN_BDS_BUILD}, but CMake targets ${ENDSTONE_BDS_BUILD}")
     endif()
 
-    if(ENDSTONE_BDS_BUILD STREQUAL "1.26.51")
-        set(ENDSTONE_EXACT_TAG "v0.11.12")
+    if(ENDSTONE_BDS_BUILD STREQUAL "1.26.52")
+        set(ENDSTONE_EXACT_TAG "v0.11.13")
     else()
         message(FATAL_ERROR
-            "The exact WorldGen adapter supports only BDS 1.26.51 with Endstone v0.11.12")
+            "The exact WorldGen adapter supports only BDS 1.26.52 with Endstone v0.11.13")
     endif()
     string(REGEX REPLACE "^v" "" ENDSTONE_EXACT_VERSION "${ENDSTONE_EXACT_TAG}")
 
@@ -104,7 +104,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
 
     set(ENDSTONE_RESULT_H "${endstone_SOURCE_DIR}/src/bedrock/platform/result.h")
     if(NOT EXISTS "${ENDSTONE_RESULT_H}")
-        message(FATAL_ERROR "Endstone v0.11.12 result.h was not found at ${ENDSTONE_RESULT_H}")
+        message(FATAL_ERROR "Endstone v0.11.13 result.h was not found at ${ENDSTONE_RESULT_H}")
     endif()
     file(READ "${ENDSTONE_RESULT_H}" ENDSTONE_RESULT_H_CONTENT)
     string(REPLACE "std::format(\"Error: {}\\nCall stack:{}\", error, call_stack)" "std::string(\"Error: \") + error" ENDSTONE_RESULT_H_CONTENT "${ENDSTONE_RESULT_H_CONTENT}")
@@ -114,7 +114,7 @@ if(ENDSTONE_WORLDGEN_BUILD_PLUGIN)
     string(FIND "${ENDSTONE_RESULT_H_CONTENT}" "${ENDSTONE_RESULT_ERROR_CODE_MESSAGE}" ENDSTONE_RESULT_ERROR_CODE_MESSAGE_INDEX)
     if(ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX EQUAL -1 AND ENDSTONE_RESULT_ERROR_CODE_MESSAGE_INDEX EQUAL -1)
         message(FATAL_ERROR
-            "Endstone v0.11.12 result.h no longer contains the expected std::error_code formatting expression")
+            "Endstone v0.11.13 result.h no longer contains the expected std::error_code formatting expression")
     endif()
     if(NOT ENDSTONE_RESULT_ERROR_CODE_FORMAT_INDEX EQUAL -1)
         string(REPLACE

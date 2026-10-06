@@ -71,7 +71,7 @@ public:
 
 class MockNativeAdapter final : public IVanillaGenerationAdapter {
 public:
-    std::string bedrockBuild() const override { return "1.26.51"; }
+    std::string bedrockBuild() const override { return "1.26.52"; }
     bool verifySymbols() noexcept override { return true; }
     NativeCapabilities capabilities() const noexcept override {
         NativeCapabilities c; c.capture_chunk = c.commit_chunk = c.chunk_request_interception = true;
@@ -166,36 +166,36 @@ public:
 };
 
 int main() {
-    assert(isSupportedBds2630Build("1.26.51"));
-    assert(isSupportedBds2630Build("26.51"));
+    assert(isSupportedBds2630Build("1.26.52"));
+    assert(isSupportedBds2630Build("26.52"));
     assert(!isSupportedBds2630Build("1.26.32"));
     assert(!isSupportedBds2630Build("26.32"));
     assert(!isSupportedBds2630Build(""));
     assert(!isSupportedBds2630Build("1.26.30"));
     assert(!isSupportedBds2630Build("1.26.20"));
     assert(!isSupportedBds2630Build("1.26.34"));
-    assert(!isSupportedBds2630Build("server-26.51"));
-    assert(isExpectedBds2630Build("26.51", "1.26.51"));
-    assert(!isExpectedBds2630Build("26.32", "1.26.51"));
-    assert(isExpectedEndstoneVersion("0.11.12", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.11", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.13", "0.11.12"));
-    assert(isExpectedEndstoneVersion("v0.11.12", "0.11.12"));
-    assert(isExpectedEndstoneVersion("0.11.12+linux.x86-64", "0.11.12"));
-    assert(isExpectedEndstoneVersion("0.11.12.dev7", "0.11.12"));
-    assert(isExpectedEndstoneVersion("v0.11.12.dev7+linux", "v0.11.12"));
-    assert(isExpectedEndstoneVersion("0.11.12-dev", "0.11.12"));
-    assert(isExpectedEndstoneVersion("0.11.12-dev+linux", "0.11.12"));
-    assert(isExpectedEndstoneVersion("0.11.12-dev.snapshot+linux", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.5", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.120", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.12.1", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.12-device", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.12+", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.12+linux..x64", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.12.dev", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.12.dev7+", "0.11.12"));
-    assert(!isExpectedEndstoneVersion("0.11.12-dev.", "0.11.12"));
+    assert(!isSupportedBds2630Build("server-26.52"));
+    assert(isExpectedBds2630Build("26.52", "1.26.52"));
+    assert(!isExpectedBds2630Build("26.32", "1.26.52"));
+    assert(isExpectedEndstoneVersion("0.11.13", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.11", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.14", "0.11.13"));
+    assert(isExpectedEndstoneVersion("v0.11.13", "0.11.13"));
+    assert(isExpectedEndstoneVersion("0.11.13+linux.x86-64", "0.11.13"));
+    assert(isExpectedEndstoneVersion("0.11.13.dev7", "0.11.13"));
+    assert(isExpectedEndstoneVersion("v0.11.13.dev7+linux", "v0.11.13"));
+    assert(isExpectedEndstoneVersion("0.11.13-dev", "0.11.13"));
+    assert(isExpectedEndstoneVersion("0.11.13-dev+linux", "0.11.13"));
+    assert(isExpectedEndstoneVersion("0.11.13-dev.snapshot+linux", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.5", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.130", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.13.1", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.13-device", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.13+", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.13+linux..x64", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.13.dev", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.13.dev7+", "0.11.13"));
+    assert(!isExpectedEndstoneVersion("0.11.13-dev.", "0.11.13"));
 
     assert(deterministicStringHash("overworld") == 0xd4447a2733c45e2dULL);
     assert(deterministicStageSeed(1234, "overworld", {2, 3}, GenerationStage::BaseTerrain) ==
