@@ -14,7 +14,7 @@ class ExactEndstoneDependencies(ConanFile):
 
     def requirements(self):
         # These private headers cross the plugin ABI boundary. Keep their
-        # dependency graph pinned to Endstone v0.11.13 for BDS 1.26.52.
+        # dependency graph pinned to Endstone v0.11.14 for BDS 1.26.52.
         self.requires("base64/0.5.2")
         self.requires("concurrentqueue/1.0.4")
         self.requires("funchook/1.1.3")
