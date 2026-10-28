@@ -1,0 +1,465 @@
+{
+  "schema_version": 1,
+  "project": "endstone-worldgen-api",
+  "version": "0.4.9",
+  "created_at_utc": "2026-09-20T22:40:21.199580+00:00",
+  "platform": "linux-x64",
+  "game_version": "1.26.51",
+  "bds_package": "1.26.51.1",
+  "endstone": "0.11.12",
+  "endstone_source_commit": "1c71186cba896c5e0bc432384a8a8e72dfb2a626",
+  "python_abi": "cp314",
+  "compiler": "Clang 20.1.8 / libc++ 20",
+  "passed": true,
+  "cpp_tests_passed": 3,
+  "clean_shutdown": true,
+  "publication_status": "release",
+  "server_binary_unchanged": true,
+  "artifacts": {
+    "endstone_worldgen_bds_1_26_51.so": {
+      "sha256": "8617744b5fa104c64c213b9665e5ee27761571cb2c4111f7d58f0878d3b985aa",
+      "size_bytes": 1717432
+    },
+    "endstone_worldgen_studio-0.4.9-cp314-cp314-linux_x86_64.whl": {
+      "sha256": "632cb6cc98b0dec74628688d8c40969319913c0a664fdaf86b7123e047ac266c",
+      "size_bytes": 173771
+    }
+  },
+  "checks": [
+    {
+      "test": "Endstone 0.11.12 startup",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "test": "native behavioral probe",
+      "passed": true,
+      "detail": {
+        "flat": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 1,
+          "planned_blocks": 200,
+          "changed_blocks": 200,
+          "changed_chunks": 1,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 289,
+          "max_changed_y": 290,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "island": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 1,
+          "planned_blocks": 354,
+          "changed_blocks": 354,
+          "changed_chunks": 1,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 286,
+          "max_changed_y": 290,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "maze": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 1,
+          "planned_blocks": 460,
+          "changed_blocks": 460,
+          "changed_chunks": 1,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 290,
+          "max_changed_y": 293,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "ores": {
+          "success": true,
+          "committed": false,
+          "failure": "none",
+          "requested_chunks": 1,
+          "planned_blocks": 0,
+          "changed_blocks": 0,
+          "changed_chunks": 0,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": null,
+          "max_changed_y": null,
+          "message": "the live recipe is already present or found no safe source blocks to replace"
+        },
+        "castle": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 9,
+          "planned_blocks": 2121,
+          "changed_blocks": 2121,
+          "changed_chunks": 9,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 290,
+          "max_changed_y": 297,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "arena": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 9,
+          "planned_blocks": 1681,
+          "changed_blocks": 1681,
+          "changed_chunks": 9,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 290,
+          "max_changed_y": 294,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "status": {
+          "available": true,
+          "interception_active": true,
+          "populator_count": 0,
+          "stats": {
+            "native_requests": 289,
+            "load_requests_ignored": 0,
+            "deduplicated": 0,
+            "dispatched": 0,
+            "committed": 0,
+            "capture_retries": 0,
+            "capture_failures": 0,
+            "commit_failures": 0,
+            "empty_pipeline_requests": 289,
+            "waiting_overflow_drops": 0,
+            "inflight": 0,
+            "waiting": 0
+          },
+          "live_stats": {
+            "requests": 6,
+            "successful_requests": 6,
+            "committed_requests": 5,
+            "no_change_requests": 1,
+            "failed_requests": 0,
+            "changed_blocks": 4816,
+            "unconfirmed_blocks": 0,
+            "descriptor_failures": 0,
+            "capture_failures": 0,
+            "commit_failures": 0,
+            "flush_failures": 0,
+            "primary_thread_rejections": 0
+          },
+          "diagnostics": {
+            "adapter": "bds-26.30-exact-hooked",
+            "runtime_build": "26.51",
+            "runtime_endstone_version": "0.11.12",
+            "exact_build_match": true,
+            "primary_thread": true,
+            "chunk_source_available": true,
+            "chunk_source_can_launch_tasks": true,
+            "interception_installed": true,
+            "hooked_chunk_sources": 3,
+            "intercepted_requests": 289,
+            "dropped_requests": 0
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "test": "clean shutdown",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "test": "no unexpected runtime errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "live_report": {
+    "flat": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 1,
+      "planned_blocks": 200,
+      "changed_blocks": 200,
+      "changed_chunks": 1,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 289,
+      "max_changed_y": 290,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "island": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 1,
+      "planned_blocks": 354,
+      "changed_blocks": 354,
+      "changed_chunks": 1,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 286,
+      "max_changed_y": 290,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "maze": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 1,
+      "planned_blocks": 460,
+      "changed_blocks": 460,
+      "changed_chunks": 1,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 290,
+      "max_changed_y": 293,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "ores": {
+      "success": true,
+      "committed": false,
+      "failure": "none",
+      "requested_chunks": 1,
+      "planned_blocks": 0,
+      "changed_blocks": 0,
+      "changed_chunks": 0,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": null,
+      "max_changed_y": null,
+      "message": "the live recipe is already present or found no safe source blocks to replace"
+    },
+    "castle": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 9,
+      "planned_blocks": 2121,
+      "changed_blocks": 2121,
+      "changed_chunks": 9,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 290,
+      "max_changed_y": 297,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "arena": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 9,
+      "planned_blocks": 1681,
+      "changed_blocks": 1681,
+      "changed_chunks": 9,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 290,
+      "max_changed_y": 294,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "status": {
+      "available": true,
+      "interception_active": true,
+      "populator_count": 0,
+      "stats": {
+        "native_requests": 289,
+        "load_requests_ignored": 0,
+        "deduplicated": 0,
+        "dispatched": 0,
+        "committed": 0,
+        "capture_retries": 0,
+        "capture_failures": 0,
+        "commit_failures": 0,
+        "empty_pipeline_requests": 289,
+        "waiting_overflow_drops": 0,
+        "inflight": 0,
+        "waiting": 0
+      },
+      "live_stats": {
+        "requests": 6,
+        "successful_requests": 6,
+        "committed_requests": 5,
+        "no_change_requests": 1,
+        "failed_requests": 0,
+        "changed_blocks": 4816,
+        "unconfirmed_blocks": 0,
+        "descriptor_failures": 0,
+        "capture_failures": 0,
+        "commit_failures": 0,
+        "flush_failures": 0,
+        "primary_thread_rejections": 0
+      },
+      "diagnostics": {
+        "adapter": "bds-26.30-exact-hooked",
+        "runtime_build": "26.51",
+        "runtime_endstone_version": "0.11.12",
+        "exact_build_match": true,
+        "primary_thread": true,
+        "chunk_source_available": true,
+        "chunk_source_can_launch_tasks": true,
+        "interception_installed": true,
+        "hooked_chunk_sources": 3,
+        "intercepted_requests": 289,
+        "dropped_requests": 0
+      }
+    },
+    "passed": true
+  },
+  "python_tests_passed": 48,
+  "packaged_artifacts": {
+    "endstone_worldgen_bds_1_26_51.so": {
+      "sha256": "2d5ce8a186949ee368ca69084496f607be7bf2d47f2833c77d1e0c406c7aa3fc",
+      "size_bytes": 1717432
+    },
+    "endstone_worldgen_studio-0.4.9-cp314-cp314-linux_x86_64.whl": {
+      "sha256": "0e06058affc18e614538803d37ba5472cb0d8fa74b4924a74d67903d395870dc",
+      "size_bytes": 173731
+    }
+  },
+  "packaged_live_checks": [
+    {
+      "test": "Endstone 0.11.12 startup",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "test": "native behavioral probe",
+      "passed": true,
+      "detail": {
+        "flat": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 1,
+          "planned_blocks": 200,
+          "changed_blocks": 200,
+          "changed_chunks": 1,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 289,
+          "max_changed_y": 290,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "island": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 1,
+          "planned_blocks": 354,
+          "changed_blocks": 354,
+          "changed_chunks": 1,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 286,
+          "max_changed_y": 290,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "maze": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 1,
+          "planned_blocks": 460,
+          "changed_blocks": 460,
+          "changed_chunks": 1,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 290,
+          "max_changed_y": 293,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "ores": {
+          "success": true,
+          "committed": false,
+          "failure": "none",
+          "requested_chunks": 1,
+          "planned_blocks": 0,
+          "changed_blocks": 0,
+          "changed_chunks": 0,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": null,
+          "max_changed_y": null,
+          "message": "the live recipe is already present or found no safe source blocks to replace"
+        },
+        "castle": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 9,
+          "planned_blocks": 2121,
+          "changed_blocks": 2121,
+          "changed_chunks": 9,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 290,
+          "max_changed_y": 297,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "arena": {
+          "success": true,
+          "committed": true,
+          "failure": "none",
+          "requested_chunks": 9,
+          "planned_blocks": 1681,
+          "changed_blocks": 1681,
+          "changed_chunks": 9,
+          "unconfirmed_blocks": 0,
+          "min_changed_y": 290,
+          "max_changed_y": 294,
+          "message": "all changed chunks passed commit and flush"
+        },
+        "status": {
+          "available": true,
+          "interception_active": true,
+          "populator_count": 0,
+          "stats": {
+            "native_requests": 289,
+            "load_requests_ignored": 0,
+            "deduplicated": 0,
+            "dispatched": 0,
+            "committed": 0,
+            "capture_retries": 0,
+            "capture_failures": 0,
+            "commit_failures": 0,
+            "empty_pipeline_requests": 289,
+            "waiting_overflow_drops": 0,
+            "inflight": 0,
+            "waiting": 0
+          },
+          "live_stats": {
+            "requests": 6,
+            "successful_requests": 6,
+            "committed_requests": 5,
+            "no_change_requests": 1,
+            "failed_requests": 0,
+            "changed_blocks": 4816,
+            "unconfirmed_blocks": 0,
+            "descriptor_failures": 0,
+            "capture_failures": 0,
+            "commit_failures": 0,
+            "flush_failures": 0,
+            "primary_thread_rejections": 0
+          },
+          "diagnostics": {
+            "adapter": "bds-26.30-exact-hooked",
+            "runtime_build": "26.51",
+            "runtime_endstone_version": "0.11.12",
+            "exact_build_match": true,
+            "primary_thread": true,
+            "chunk_source_available": true,
+            "chunk_source_can_launch_tasks": true,
+            "interception_installed": true,
+            "hooked_chunk_sources": 3,
+            "intercepted_requests": 289,
+            "dropped_requests": 0
+          }
+        },
+        "passed": true
+      }
+    },
+    {
+      "test": "clean shutdown",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "test": "no unexpected runtime errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "validation_scope": "Disposable server and offline tests; no connected-player session in this update.",
+  "python_tests_log_sha256": "694be334107ea4b694f28502f51ec282ad5ecb3457749a1b38d7880095083936",
+  "release_tag": "v0.4.9"
+}

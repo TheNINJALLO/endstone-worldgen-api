@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "project": "endstone-worldgen-api",
+  "version": "0.4.8",
+  "created_at_utc": "2026-09-17T03:13:17.363103+00:00",
+  "platform": "linux-x64",
+  "game_version": "1.26.51",
+  "bds_package": "1.26.51.1",
+  "endstone": "0.11.11",
+  "endstone_source_commit": "37b395378d91d6d20f1c52bf9d79dbd20e152458",
+  "python_abi": "cp314",
+  "compiler": "Clang 20.1.8 / libc++ 20",
+  "passed": true,
+  "cpp_tests_passed": 3,
+  "python_tests_passed": 48,
+  "clean_shutdown": true,
+  "live_report": {
+    "flat": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 1,
+      "planned_blocks": 195,
+      "changed_blocks": 195,
+      "changed_chunks": 1,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 289,
+      "max_changed_y": 290,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "island": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 1,
+      "planned_blocks": 113,
+      "changed_blocks": 113,
+      "changed_chunks": 1,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 289,
+      "max_changed_y": 290,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "maze": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 1,
+      "planned_blocks": 119,
+      "changed_blocks": 119,
+      "changed_chunks": 1,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 290,
+      "max_changed_y": 291,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "ores": {
+      "success": true,
+      "committed": false,
+      "failure": "none",
+      "requested_chunks": 1,
+      "planned_blocks": 0,
+      "changed_blocks": 0,
+      "changed_chunks": 0,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": null,
+      "max_changed_y": null,
+      "message": "the live recipe is already present or found no safe source blocks to replace"
+    },
+    "castle": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 9,
+      "planned_blocks": 1653,
+      "changed_blocks": 1653,
+      "changed_chunks": 9,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 290,
+      "max_changed_y": 294,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "arena": {
+      "success": true,
+      "committed": true,
+      "failure": "none",
+      "requested_chunks": 9,
+      "planned_blocks": 1653,
+      "changed_blocks": 1653,
+      "changed_chunks": 9,
+      "unconfirmed_blocks": 0,
+      "min_changed_y": 290,
+      "max_changed_y": 294,
+      "message": "all changed chunks passed commit and flush"
+    },
+    "status": {
+      "available": true,
+      "interception_active": true,
+      "populator_count": 0,
+      "stats": {
+        "native_requests": 289,
+        "load_requests_ignored": 0,
+        "deduplicated": 0,
+        "dispatched": 0,
+        "committed": 0,
+        "capture_retries": 0,
+        "capture_failures": 0,
+        "commit_failures": 0,
+        "empty_pipeline_requests": 289,
+        "waiting_overflow_drops": 0,
+        "inflight": 0,
+        "waiting": 0
+      },
+      "live_stats": {
+        "requests": 6,
+        "successful_requests": 6,
+        "committed_requests": 5,
+        "no_change_requests": 1,
+        "failed_requests": 0,
+        "changed_blocks": 3733,
+        "unconfirmed_blocks": 0,
+        "descriptor_failures": 0,
+        "capture_failures": 0,
+        "commit_failures": 0,
+        "flush_failures": 0,
+        "primary_thread_rejections": 0
+      },
+      "diagnostics": {
+        "adapter": "bds-26.30-exact-hooked",
+        "runtime_build": "26.51",
+        "runtime_endstone_version": "0.11.11",
+        "exact_build_match": true,
+        "primary_thread": true,
+        "chunk_source_available": true,
+        "chunk_source_can_launch_tasks": true,
+        "interception_installed": true,
+        "hooked_chunk_sources": 3,
+        "intercepted_requests": 289,
+        "dropped_requests": 0
+      }
+    },
+    "passed": true
+  },
+  "live_log_sha256": "02ee7f866fc6fa7718889dfc43da0e98289ae53c8f53dc79a1a7063c80aa1cd9",
+  "scope": "Disposable server qualification; no Windows native release. Later private runtimes require their own exact binary qualification.",
+  "release_artifacts": {
+    "endstone-worldgen-api-v0.4.8-bds-1.26.51-linux-x64.so": {
+      "bytes": 1717688,
+      "sha256": "654ab2b131181669eab803098e72ad4947cbdc3b8a25e67d8583ec87c1476ea7"
+    },
+    "endstone_worldgen_studio-0.4.8-cp314-cp314-linux_x86_64.whl": {
+      "bytes": 173732,
+      "sha256": "120302aa0ec4f61b93242e0a33566d6d296e25f2402a61c378bf5b50c2314adf"
+    }
+  },
+  "release_artifacts_live_tested": true
+}

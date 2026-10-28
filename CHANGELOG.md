@@ -1,4 +1,50 @@
+# Changelog
+
+## 0.4.12 - 2026-10-28
+
+Update the exact native target to Minecraft 26.60 / BDS 1.26.60.6 and Endstone 0.11.15 (CPython 3.14). Refresh private addresses, instruction guards, and changed object layouts. Qualification evidence records the executed runtime checks.
+
+## 0.4.11 - 2026-10-12
+
+Update the pinned SDK and exact native runtime for Endstone 0.11.14. Refresh native addresses and binary guards, rebuild matching packages, and qualify them on disposable BDS 1.26.52.3 servers. Preserve historical 0.11.13 profiles and evidence.
+
+## 0.4.10 - Endstone 0.11.13 / Minecraft 1.26.52
+
+- Update the pinned SDK and runtime gates to Endstone 0.11.13 and BDS 1.26.52.3 / runtime 26.52.
+- Refresh native hook addresses, binary identities, and instruction fingerprints.
+- Keep network protocol 2193 and preserve earlier compatibility evidence.
+
+## 0.4.9 — Endstone 0.11.12
+
+- Update the SDK and native Endstone guards to 0.11.12; retain BDS 1.26.51.1, runtime 26.51, and CPython 3.14.
+- Refresh Endstone binary identities and private addresses where used; preserve exact runtime checks and historical 0.11.11 evidence.
+- Keep the portable package requirement at Endstone >=0.11.11 without an upper bound.
+
+## 0.4.8-alpha.1
+
+- Release the 1.26.51 / Endstone 0.11.11 compatibility preparation as source and a portable API wheel.
+- Native runtime qualification remains pending; see `RELEASE_NOTES.md`.
+
 ## 0.4.7
+
+## 0.4.8 — BDS 1.26.51 / Endstone 0.11.11
+
+- Select game 1.26.51, actual server package 1.26.51.1, and Endstone 0.11.11.
+- Raise command-wheel requirements to Endstone >=0.11.11 with no upper bound.
+- Verify both official 1.26.51.1 downloads against Endstone's server metadata.
+- Record the v0.11.11 SDK commit and generated symbol-table fingerprints.
+- Default target preparation to this known release and retain 1.26.50.5 as history.
+- Keep native deployment qualification pending the adapter port and live tests.
+
+
+## Unreleased ? BDS 1.26.50.5 preparation
+
+- Record supplied Linux and Windows archive/executable fingerprints.
+- Accept Endstone >=0.11.10 in command wheels without an upper version bound.
+- Add target preparation and a gate that rejects unqualified native releases.
+- Keep old exact ABI profiles active until the new Endstone runtime is available
+  and new server layouts have been verified.
+
 
 - Reclassified the expected startup-time zero-populator state as informational: dependent native consumers register only after the WorldGen service is enabled, and `/wg gen` plus `/wg structure` use a separate live-recipe path.
 - Added conflict-safe automatic population commits. Worker results now skip unchanged chunks, retry bounded safety recaptures, merge block and supported-biome deltas into a fresh snapshot, propagate new palette descriptors, preserve unrelated live edits, and reject conflicts before commit.
@@ -67,7 +113,6 @@
 - Synchronized workflow, package, CMake and source-release versions.
 - Included the actual hidden `.github/workflows/ci.yml` files in the release package.
 
-# Changelog
 
 ## 0.4.5-alpha.9
 

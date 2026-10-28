@@ -1,0 +1,15 @@
+{
+  "bds_package": "1.26.51.1",
+  "bds_sha256": "e93e739f373a84edfff7c9cd76fcb090c2176744b412e1143f1b38e91a49bed4",
+  "virtual_function_count": 42,
+  "create_ordinal": 8,
+  "load_ordinal": 9,
+  "tables": {
+    "EditorChunkSource": "0xef085d8",
+    "NetworkChunkSource": "0xf2ede18",
+    "WorldLimitChunkSource": "0xf2edfe8",
+    "MainChunkSource": "0xf2ef6c0",
+    "ChunkSource": "0xf2f0a70"
+  },
+  "verification": "Exact ELF vtable boundaries and disposable live server interception plus six generation recipes"
+}

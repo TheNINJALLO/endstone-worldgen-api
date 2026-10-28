@@ -71,7 +71,7 @@ public:
 
 class MockNativeAdapter final : public IVanillaGenerationAdapter {
 public:
-    std::string bedrockBuild() const override { return "1.26.33"; }
+    std::string bedrockBuild() const override { return "1.26.60"; }
     bool verifySymbols() noexcept override { return true; }
     NativeCapabilities capabilities() const noexcept override {
         NativeCapabilities c; c.capture_chunk = c.commit_chunk = c.chunk_request_interception = true;
@@ -166,34 +166,37 @@ public:
 };
 
 int main() {
-    assert(isSupportedBds2630Build("1.26.33"));
-    assert(isSupportedBds2630Build("26.33"));
+    assert(isSupportedBds2630Build("1.26.60"));
+    assert(isSupportedBds2630Build("26.60"));
     assert(!isSupportedBds2630Build("1.26.32"));
     assert(!isSupportedBds2630Build("26.32"));
     assert(!isSupportedBds2630Build(""));
     assert(!isSupportedBds2630Build("1.26.30"));
     assert(!isSupportedBds2630Build("1.26.20"));
     assert(!isSupportedBds2630Build("1.26.34"));
-    assert(!isSupportedBds2630Build("server-26.33"));
-    assert(isExpectedBds2630Build("26.33", "1.26.33"));
-    assert(!isExpectedBds2630Build("26.32", "1.26.33"));
-    assert(isExpectedEndstoneVersion("0.11.6", "0.11.6"));
-    assert(isExpectedEndstoneVersion("v0.11.6", "0.11.6"));
-    assert(isExpectedEndstoneVersion("0.11.6+linux.x86-64", "0.11.6"));
-    assert(isExpectedEndstoneVersion("0.11.6.dev7", "0.11.6"));
-    assert(isExpectedEndstoneVersion("v0.11.6.dev7+linux", "v0.11.6"));
-    assert(isExpectedEndstoneVersion("0.11.6-dev", "0.11.6"));
-    assert(isExpectedEndstoneVersion("0.11.6-dev+linux", "0.11.6"));
-    assert(isExpectedEndstoneVersion("0.11.6-dev.snapshot+linux", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.5", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.60", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.6.1", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.6-device", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.6+", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.6+linux..x64", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.6.dev", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.6.dev7+", "0.11.6"));
-    assert(!isExpectedEndstoneVersion("0.11.6-dev.", "0.11.6"));
+    assert(!isSupportedBds2630Build("server-26.60"));
+    assert(isExpectedBds2630Build("26.60", "1.26.60"));
+    assert(!isExpectedBds2630Build("26.32", "1.26.60"));
+    assert(isExpectedEndstoneVersion("0.11.15", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.11", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.16", "0.11.15"));
+    assert(!isSupportedBds2630Build("26.52"));
+    assert(isExpectedEndstoneVersion("v0.11.15", "0.11.15"));
+    assert(isExpectedEndstoneVersion("0.11.15+linux.x86-64", "0.11.15"));
+    assert(isExpectedEndstoneVersion("0.11.15.dev7", "0.11.15"));
+    assert(isExpectedEndstoneVersion("v0.11.15.dev7+linux", "v0.11.15"));
+    assert(isExpectedEndstoneVersion("0.11.15-dev", "0.11.15"));
+    assert(isExpectedEndstoneVersion("0.11.15-dev+linux", "0.11.15"));
+    assert(isExpectedEndstoneVersion("0.11.15-dev.snapshot+linux", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.5", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.150", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.15.1", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.15-device", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.15+", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.15+linux..x64", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.15.dev", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.15.dev7+", "0.11.15"));
+    assert(!isExpectedEndstoneVersion("0.11.15-dev.", "0.11.15"));
 
     assert(deterministicStringHash("overworld") == 0xd4447a2733c45e2dULL);
     assert(deterministicStageSeed(1234, "overworld", {2, 3}, GenerationStage::BaseTerrain) ==

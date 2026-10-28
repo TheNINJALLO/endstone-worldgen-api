@@ -1,4 +1,40 @@
+# Minecraft 26.60 / Endstone 0.11.15 validation - 2026-10-28
+
+BDS **1.26.60.6**, runtime **26.60**, network protocol **2225**, CPython **3.14**, Linux x86-64. 3 CTest checks and 52 Python tests passed. The exact deployment binaries and wheels passed live behavior, save/query/resume, persisted-block restart and clean shutdown. Qualification used `enable-script=true` and no connected-player session.
+
+Current evidence: `compatibility/native-qualification.json`. Windows native API packages and `enable-script=false` remain unqualified. Historical records follow unchanged.
+
+---
+
+# Endstone 0.11.14 validation — 2026-10-12
+
+BDS remains 1.26.52.3 (protocol 2193). Linux native build, 48 Python tests, the recorded CTest suite and disposable live checks passed. Exact runtime guards remain enabled. Current evidence: `compatibility/native-qualification.json`. Windows native API ports remain unqualified. Release assets contain the qualified Linux build.
+
+Previous validation records follow.
+
+# Endstone 0.11.14 / BDS 1.26.52.3 validation
+
+3 CTest checks and 48 Python tests passed. The packaged native plugin and matching CPython 3.14 wheel passed live behavioral checks, save/query/resume, and clean shutdown in disposable servers.
+
+Evidence: `compatibility/native-qualification.json`. Network protocol remains 2193. Previous results below refer to earlier releases.
+
+# Endstone 0.11.12 validation
+
+Current evidence is in `compatibility/native-qualification.json`; the server remains BDS 1.26.51.1. The records below describe the previous 0.11.11 release.
+
 # Validation results
+
+## BDS 1.26.51 / Endstone 0.11.11 target
+
+The active compatibility target is **game 1.26.51**, server package
+**1.26.51.1**, and **Endstone 0.11.11**. Source command wheels require
+**Endstone >=0.11.11**, with no upper bound. Both official server archives
+have been checksum-verified and the matching SDK commit is recorded.
+The native adapter port and live validation remain pending.
+See [target details and verification commands](docs/BDS_1_26_51.md).
+The release information below describes the previous exact server target.
+
+
 
 Validated on 2026-07-28:
 
