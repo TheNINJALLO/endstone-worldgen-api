@@ -1,8 +1,8 @@
-# Install Endstone Worldgen API v0.4.11
+# Install Endstone Worldgen API v0.4.12
 
-Version: `v0.4.11`. [Download release](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.11).
+Version: `v0.4.12`. [Download release](https://github.com/TheNINJALLO/endstone-worldgen-api/releases/tag/v0.4.12).
 
-Use BDS **1.26.52.3**, **Endstone 0.11.14**, and **CPython 3.14** on Linux x86-64. Stop the server, replace the previous native plugin and command wheel together with the release `.so` and matching `cp314-cp314-linux_x86_64.whl`, then restart. BDS itself does not need updating.
+Use BDS **1.26.60.6**, **Endstone 0.11.15**, and **CPython 3.14** on Linux x86-64. Stop the server, replace the previous native plugin and command wheel together with the release `.so` and matching `cp314-cp314-linux_x86_64.whl`, then restart. BDS itself does not need updating.
 
 The complete deployment ZIP contains both plugin files. The portable API wheel alone does not install the server plugin. Windows native binaries are not included.
 

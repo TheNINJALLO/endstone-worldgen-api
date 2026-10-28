@@ -1,15 +1,15 @@
 {
   "name": "endstone-worldgen-api",
-  "version": "0.4.11",
-  "adapter_family": "minecraft-bedrock-26.52",
+  "version": "0.4.12",
+  "adapter_family": "minecraft-bedrock-26.60",
   "supported_bds": [
-    "1.26.52"
+    "1.26.60"
   ],
   "endstone_tags": [
-    "v0.11.14"
+    "v0.11.15"
   ],
   "portable_tests": "included in GitHub Actions",
-  "native_validation": "Endstone 0.11.14 / BDS 1.26.52.3: Linux native build, CTest, Python suites and disposable live checks passed; compatibility/native-qualification.json records the executed scope.",
+  "native_validation": "Endstone 0.11.15 / BDS 1.26.60.6: 3 CTest checks, 52 Python tests, exact packaged-artifact live checks, persisted-block restart and clean shutdown passed. No connected-player session. See compatibility/native-qualification.json.",
   "github_actions": {
     "push_artifacts": true,
     "tagged_releases": true,
@@ -17,7 +17,7 @@
       "linux-x64"
     ],
     "bds": [
-      "1.26.52"
+      "1.26.60"
     ],
     "linux_runner": "ubuntu-22.04 + clang-20 + libc++20 + Ninja",
     "windows_toolchain": "Visual Studio environment + clang-cl + lld-link + Ninja + Conan 2",
@@ -26,17 +26,18 @@
   },
   "endstone_requirement": ">=0.11.11",
   "historical_preparation_profiles": [
-    "compatibility/bds-1.26.50.5.json"
+    "compatibility/bds-1.26.50.5.json",
+    "compatibility/bds-1.26.60-preparation.json"
   ],
-  "python_version": "0.4.11",
+  "python_version": "0.4.12",
   "release_channel": "native-release",
   "native_release_ready": true,
   "qualified_targets": [
     {
-      "game_version": "1.26.52",
-      "bds_package": "1.26.52.3",
-      "endstone": "0.11.14",
-      "profile": "compatibility/bds-1.26.52.json",
+      "game_version": "1.26.60",
+      "bds_package": "1.26.60.6",
+      "endstone": "0.11.15",
+      "profile": "compatibility/bds-1.26.60.json",
       "status": "qualified-linux-x64",
       "platforms": [
         "linux-x64"
@@ -44,5 +45,6 @@
     }
   ],
   "publication_status": "release-prepared",
-  "release_tag": "v0.4.11"
+  "release_tag": "v0.4.12",
+  "pending_targets": []
 }

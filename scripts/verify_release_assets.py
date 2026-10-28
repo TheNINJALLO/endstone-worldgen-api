@@ -21,7 +21,7 @@ WHEEL_PREFIXES = {
     "endstone-worldgen-api": "endstone_worldgen_studio",
 }
 SUPPORTED_BDS = {
-    "endstone-worldgen-api": {"1.26.52"},
+    "endstone-worldgen-api": {"1.26.60"},
 }
 
 

@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "project": "endstone-worldgen-api",
+  "bds_package": "1.26.60.6",
+  "platform": "linux-x64",
+  "status": "offline-preparation-only",
+  "native_adapter_qualified": false,
+  "native_release_ready": false,
+  "endstone_runtime": null,
+  "executable": {
+    "filename": "bedrock_server",
+    "sha256": "ea16b541a448e07c337848d2c5f37321b706554b5216dd942f3f11e7a8ed2bad",
+    "size_bytes": 265500280,
+    "format": "ELF64",
+    "gnu_build_id": "52576b75b6af5a09a6bde582be804e29657dbbf3"
+  },
+  "qualification_required": [
+    "Obtain an Endstone SDK and runtime supporting BDS 1.26.60.6; record its actual version, commit, Python ABI, and binary identities",
+    "Review changed BDS functions, object layouts, virtual slots, and callsite contracts recorded in the prepared hook manifest",
+    "Relocate and fingerprint private Endstone functions against the new runtime; do not reuse the 0.11.14 addresses",
+    "Rebuild the native plugin and matching Python bridge against that exact SDK and Python ABI",
+    "Run disposable-server load, gameplay, persistence, restart, and clean-shutdown regressions before marking any platform qualified",
+    "Keep this preparation unpublished until native qualification passes and release is separately requested"
+  ],
+  "sites": [
+    {
+      "previous_address": "0xca0aa80",
+      "uses": [
+        "endstone-worldgen-api/main_create_new"
+      ],
+      "method": "RTTI vtable ordinal",
+      "review_required": true,
+      "normalized_function_identical": false,
+      "status": "mapped-offline",
+      "address": "0xcfbbf10",
+      "file_offset": 217820944,
+      "bytes": "4157415641554154534883ec204989d64989f74889fb488b76304885f6741248"
+    },
+    {
+      "previous_address": "0xca314e0",
+      "uses": [
+        "endstone-worldgen-api/get_or_load"
+      ],
+      "method": "RTTI vtable ordinal",
+      "review_required": true,
+      "normalized_function_identical": false,
+      "status": "mapped-offline",
+      "address": "0xcfe0bc0",
+      "file_offset": 217971648,
+      "bytes": "554157415641554154534881ecb80000004489c589cb4989d44989fe488b0648"
+    },
+    {
+      "previous_address": "0xf2efae0",
+      "uses": [
+        "endstone-worldgen-api/main_chunk_source_vtable_address_point"
+      ],
+      "method": "vtable:15MainChunkSource",
+      "review_required": true,
+      "normalized_function_identical": false,
+      "status": "mapped-offline",
+      "address": "0xfbcee98",
+      "file_offset": 264031896,
+      "bytes": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "source_reference": {
+    "bds": "1.26.52.3",
+    "endstone": "0.11.14",
+    "source_files": {
+      "src/bds_26_30_adapter.cpp": "21f3c2c70e3dd87341c9be0683b07fe5cc6ba7d2ac55ff9985616c1ffb369c9c"
+    }
+  },
+  "virtual_slots": {
+    "create_new_chunk": 8,
+    "get_or_load_chunk": 9,
+    "previous_table_count": 42,
+    "observed_table_count": 42,
+    "sdk_chunk_source_layout_verified": false
+  }
+}
